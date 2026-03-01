@@ -2365,7 +2365,7 @@ var T = {{ t|tojson }};
     window.addEventListener('resize', function() {
         if (isMobile()) {
             sidebar.classList.remove('collapsed');
-            closeMobileSidebar();
+            closeSidebar();
         } else {
             sidebar.classList.remove('mobile-open');
             sidebarBackdrop.classList.remove('active');
