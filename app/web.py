@@ -534,11 +534,18 @@ def inject_auth():
             active_theme_data = active_mod.theme_data
             active_theme_id = active_mod.id
 
+    # All themes with loaded data (enabled + disabled) for settings gallery
+    all_theme_modules = [
+        m for m in (_module_loader.get_theme_modules() if _module_loader else [])
+        if m.theme_data
+    ]
+
     return {
         "auth_enabled": auth_enabled,
         "version": APP_VERSION,
         "update_available": _check_for_update(),
         "modules": modules,
+        "all_theme_modules": all_theme_modules,
         "active_theme_data": active_theme_data,
         "active_theme_id": active_theme_id,
     }

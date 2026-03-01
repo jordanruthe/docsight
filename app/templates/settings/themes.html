@@ -45,13 +45,8 @@
         </div>
 
         <div class="theme-gallery" id="theme-gallery">
-            {% set theme_modules = [] %}
-            {% for mod in modules if mod.type == 'theme' and mod.theme_data %}
-                {% if theme_modules.append(mod) %}{% endif %}
-            {% endfor %}
-
-            {% if theme_modules %}
-                {% for mod in theme_modules %}
+            {% if all_theme_modules %}
+                {% for mod in all_theme_modules %}
                 <div class="theme-card glass {% if mod.id == active_theme_id %}active{% endif %}"
                      data-theme-id="{{ mod.id }}"
                      data-theme-name="{{ mod.name }}"
