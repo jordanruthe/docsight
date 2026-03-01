@@ -846,7 +846,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
     initThemeToggle();
-    initThemeToggleInThemes();
     initFormSubmit();
     initUnsavedDetection();
     initTimezoneHint();
@@ -1006,13 +1005,6 @@ function applyTheme(themeId) {
         });
 }
 
-function initThemeToggleInThemes() {
-    var toggle = document.getElementById('theme-toggle-themes');
-    if (toggle) {
-        var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-        toggle.checked = isDark;
-    }
-}
 
 /* ── Theme Registry ── */
 function refreshRegistry() {
