@@ -22,6 +22,92 @@ var _currentSeverityFilter = '';
 var _hideOperational = true;
 var _OPERATIONAL_EVENT_TYPES = { monitoring_started: true, monitoring_stopped: true };
 
+/* ── Rich event message formatter ── */
+function _fmtNum(n) {
+    if (typeof n !== 'number') return escapeHtml(String(n));
+    return n.toLocaleString('en-US', { maximumFractionDigits: 1 });
+}
+
+function _healthDot(h) {
+    var cls = (h === 'good' || h === 'marginal' || h === 'poor') ? h : 'unknown';
+    return '<span class="health-dot ' + cls + '"></span>' + escapeHtml(h);
+}
+
+function formatEventMessage(ev) {
+    var d = ev.details;
+    if (!d) return escapeHtml(ev.message);
+
+    switch (ev.event_type) {
+        case 'health_change':
+            return _healthDot(d.prev) +
+                '<span class="ev-arrow">\u2192</span>' +
+                _healthDot(d.current);
+
+        case 'power_change': {
+            var dir = d.direction === 'downstream' ? 'DS' : 'US';
+            var delta = d.current - d.prev;
+            var sign = delta >= 0 ? '+' : '';
+            return '<span class="ev-label">' + escapeHtml(dir) + ' Power</span>' +
+                '<span class="ev-val">' + _fmtNum(d.prev) + '</span>' +
+                '<span class="ev-arrow">\u2192</span>' +
+                '<span class="ev-val">' + _fmtNum(d.current) + '</span> dBmV ' +
+                '<span class="ev-warn">' + (delta >= 0 ? '\u25B2' : '\u25BC') + ' ' + sign + _fmtNum(delta) + '</span>';
+        }
+
+        case 'snr_change': {
+            var thr = d.threshold === 'critical' ? 'ev-down' : 'ev-warn';
+            return '<span class="ev-label">DS SNR</span>' +
+                '<span class="ev-val">' + _fmtNum(d.prev) + '</span>' +
+                '<span class="ev-arrow">\u2192</span>' +
+                '<span class="ev-val ' + thr + '">' + _fmtNum(d.current) + '</span> dB ' +
+                '<span class="ev-muted">(' + escapeHtml(d.threshold) + ')</span>';
+        }
+
+        case 'channel_change': {
+            var chDir = d.direction === 'downstream' ? 'DS' : 'US';
+            var chDelta = d.current - d.prev;
+            var chCls = chDelta < 0 ? 'ev-down' : 'ev-up';
+            var chSign = chDelta >= 0 ? '+' : '';
+            return '<span class="ev-label">' + escapeHtml(chDir) + ' Channels</span>' +
+                '<span class="ev-val">' + _fmtNum(d.prev) + '</span>' +
+                '<span class="ev-arrow">\u2192</span>' +
+                '<span class="ev-val">' + _fmtNum(d.current) + '</span> ' +
+                '<span class="' + chCls + '">' + (chDelta < 0 ? '\u25BC' : '\u25B2') + ' ' + chSign + chDelta + '</span>';
+        }
+
+        case 'modulation_change': {
+            var changes = d.changes || [];
+            var isDown = d.direction === 'downgrade';
+            var html = '<span>' + escapeHtml(ev.message) + '</span>';
+            changes.forEach(function(c) {
+                var arrow = isDown ? '\u25BC' : '\u25B2';
+                var cls = isDown ? 'ev-down' : 'ev-up';
+                var ranks = Math.abs(c.rank_drop || 0);
+                html += '<span class="ev-sub">' +
+                    escapeHtml(c.direction) + ' Ch ' + escapeHtml(String(c.channel)) + ': ' +
+                    '<span class="ev-val">' + escapeHtml(c.prev) + '</span>' +
+                    '<span class="ev-arrow">\u2192</span>' +
+                    '<span class="ev-val">' + escapeHtml(c.current) + '</span> ' +
+                    '<span class="' + cls + '">' + arrow + ' ' + ranks + ' rank' + (ranks !== 1 ? 's' : '') + '</span>' +
+                    '</span>';
+            });
+            return html;
+        }
+
+        case 'error_spike': {
+            var spikeDelta = d.delta || (d.current - d.prev);
+            return '<span class="ev-val ev-warn">+' + _fmtNum(spikeDelta) + '</span> uncorrectable errors ' +
+                '<span class="ev-muted">(' + _fmtNum(d.prev) + ' \u2192 ' + _fmtNum(d.current) + ')</span>';
+        }
+
+        case 'monitoring_started':
+            return escapeHtml('Monitoring started') + ' ' + _healthDot(d.health || 'unknown');
+
+        default:
+            return escapeHtml(ev.message);
+    }
+}
+
 function toggleHideOperational() {
     _hideOperational = !_hideOperational;
     var btn = document.getElementById('hide-operational-btn');
