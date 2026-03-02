@@ -35,6 +35,7 @@
   },
 
   "errors": {
-    "uncorrectable_pct": { "warning": 1.0, "critical": 3.0 }
+    "uncorrectable_pct": { "warning": 1.0, "critical": 3.0 },
+    "spike_expiry_hours": 48
   }
 }

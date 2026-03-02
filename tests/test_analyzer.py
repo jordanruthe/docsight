@@ -764,3 +764,10 @@ class TestPercentErrors:
         assert result["summary"]["ds_uncorr_pct"] == 0.0
         assert "uncorr_errors_high" not in result["summary"]["health_issues"]
         assert "uncorr_errors_critical" not in result["summary"]["health_issues"]
+
+
+class TestSpikeExpiryThreshold:
+    def test_default_spike_expiry_hours(self):
+        from app.analyzer import _get_spike_expiry_hours
+        hours = _get_spike_expiry_hours()
+        assert hours == 48

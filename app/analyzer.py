@@ -126,6 +126,12 @@ def _get_uncorr_thresholds():
     }
 
 
+def _get_spike_expiry_hours():
+    """Get spike expiry window in hours (default 48)."""
+    errors = _t().get("errors", {})
+    return errors.get("spike_expiry_hours", 48)
+
+
 def _parse_qam_order(modulation_str):
     """Extract QAM order from modulation string. Returns None if unparseable."""
     if not modulation_str:
