@@ -184,6 +184,8 @@ function loadEvents(append) {
                 tr.setAttribute('data-event-id', ev.id);
                 var sevClass = 'sev-badge-' + ev.severity;
                 var sevLabel = _sevLabels[ev.severity] || ev.severity;
+                var sevIcons = { info: 'info', warning: 'triangle-alert', critical: 'octagon-alert' };
+                var sevIcon = sevIcons[ev.severity] || 'info';
                 var typeLabel = _eventTypeLabels[ev.event_type] || ev.event_type;
                 // Note: escapeHtml is used on all user-facing content to prevent XSS.
                 // The ack button uses a hardcoded event ID (integer) which is safe.
@@ -192,7 +194,7 @@ function loadEvents(append) {
                     : '<button class="btn-ack" onclick="acknowledgeEvent(' + ev.id + ', event)">&#10003;</button>';
                 tr.innerHTML =
                     '<td style="white-space:nowrap;">' + escapeHtml(ev.timestamp.replace('T', ' ')) + '</td>' +
-                    '<td><span class="' + sevClass + '">' + sevLabel + '</span></td>' +
+                    '<td><span class="' + sevClass + '"><span class="sev-text">' + sevLabel + '</span><i data-lucide="' + sevIcon + '" class="sev-icon"></i></span></td>' +
                     '<td>' + escapeHtml(typeLabel) + '</td>' +
                     '<td class="event-msg">' + formatEventMessage(ev) + '</td>' +
                     '<td class="event-actions">' + ackBtn + '</td>';

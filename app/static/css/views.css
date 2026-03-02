@@ -323,6 +323,7 @@
 .sev-info { color: var(--info); }
 .sev-warning { color: var(--warn); }
 .sev-critical { color: var(--crit); }
+.sev-icon { display: none; }
 .sev-badge-info {
     background: rgba(59,130,246,0.2);
     color: var(--info);
@@ -448,6 +449,10 @@
     #events-table td.event-msg {
         max-width: 45vw;
     }
+    /* Show severity icons instead of text on mobile */
+    .sev-text { display: none; }
+    .sev-icon { display: inline-block; width: 16px; height: 16px; vertical-align: middle; }
+    [class^="sev-badge-"] { padding: 4px; line-height: 0; }
 }
 
 
