@@ -46,6 +46,7 @@ class ModuleInfo:
     collector_class: type | None = None
     publisher_class: type | None = None
     driver_class: type | None = None
+    hints: dict = field(default_factory=dict)
     thresholds_data: dict | None = None
     theme_data: dict | None = None
     has_css: bool = False
@@ -118,6 +119,7 @@ def validate_manifest(raw: dict, module_path: str) -> ModuleInfo:
         license=raw.get("license", ""),
         config=raw.get("config", {}),
         menu={**{"order": 999}, **raw.get("menu", {})},
+        hints=raw.get("hints", {}),
     )
 
 

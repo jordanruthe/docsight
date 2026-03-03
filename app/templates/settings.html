@@ -193,6 +193,7 @@ var serverTz = '{{ server_tz }}';
 var currentLang = '{{ lang }}';
 var currentTz = '{{ config.timezone|default("", true) }}';
 try { var savedCooldowns = JSON.parse('{{ config.notify_cooldowns|default("{}")|e }}'); } catch(e) { var savedCooldowns = {}; }
+var DRIVER_HINTS = {{ driver_hints | tojson }};
 </script>
 <script src="/static/js/settings.js"></script>
 {% for mod in modules if mod.has_js %}

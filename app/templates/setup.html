@@ -663,54 +663,44 @@ function toggleTheme() {
     }
 })();
 
-// Username field toggle and modem defaults
-function toggleUsernameField() {
-    const modemType = document.getElementById('modem_type').value;
-    const usernameField = document.getElementById('modem_user');
-    const urlField = document.getElementById('modem_url');
-    const credGroup = document.getElementById('modem-credentials-group');
+// Driver hints (data-driven UI defaults)
+var DRIVER_HINTS = {{ driver_hints | tojson }};
+var DEFAULT_URL = 'http://192.168.178.1';
+var NOT_REQUIRED_TEXT = '{{ t.not_required|default("Not required for this modem") }}';
 
-    // Generic router needs no URL, credentials, or connection test
-    if(modemType === 'generic') {
+function toggleUsernameField() {
+    var modemType = document.getElementById('modem_type').value;
+    var usernameField = document.getElementById('modem_user');
+    var urlField = document.getElementById('modem_url');
+    var credGroup = document.getElementById('modem-credentials-group');
+    var hints = DRIVER_HINTS[modemType] || {};
+
+    // Hide credentials group when not required (e.g. generic router)
+    if(hints.credentials_required === false) {
         credGroup.style.display = 'none';
         return;
     }
     credGroup.style.display = '';
 
-    if(modemType === 'ultrahub7') {
+    // URL default: apply if field is empty or still shows the global default
+    if(hints.default_url && (!urlField.value || urlField.value === DEFAULT_URL)) {
+        urlField.value = hints.default_url;
+    }
+
+    // Username handling
+    if(hints.username_required === false) {
         usernameField.disabled = true;
         usernameField.value = '';
-        usernameField.placeholder = '{{ t.not_required|default("Not required for this modem") }}';
+        usernameField.placeholder = NOT_REQUIRED_TEXT;
         usernameField.style.opacity = '0.5';
         usernameField.style.cursor = 'not-allowed';
     } else {
         usernameField.disabled = false;
         usernameField.style.opacity = '1';
         usernameField.style.cursor = 'text';
-        if(modemType === 'vodafone_station') {
-            if(!urlField.value || urlField.value === 'http://192.168.178.1') {
-                urlField.value = 'http://192.168.0.1';
-            }
-            if(!usernameField.value) {
-                usernameField.value = 'admin';
-            }
-            usernameField.placeholder = 'admin';
-        } else if(modemType === 'tc4400') {
-            if(!urlField.value || urlField.value === 'http://192.168.178.1') {
-                urlField.value = 'http://192.168.100.1';
-            }
-            if(!usernameField.value) {
-                usernameField.value = 'admin';
-            }
-            usernameField.placeholder = 'admin';
-        } else if(modemType === 'cm3500') {
-            if(!urlField.value || urlField.value === 'http://192.168.178.1') {
-                urlField.value = 'https://192.168.100.1';
-            }
-            if(!usernameField.value) {
-                usernameField.value = 'admin';
-            }
-            usernameField.placeholder = 'admin';
+        if(hints.default_user) {
+            if(!usernameField.value) usernameField.value = hints.default_user;
+            usernameField.placeholder = hints.default_user;
         } else {
             usernameField.placeholder = 'admin';
         }

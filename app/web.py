@@ -685,8 +685,9 @@ def setup():
     tz_name, tz_offset = _server_tz_info()
     from .drivers import driver_registry
     modem_types = driver_registry.get_available_drivers()
+    driver_hints = driver_registry.get_driver_hints()
     iana_tz = _guess_iana_timezone()
-    return render_template("setup.html", config=config, poll_min=POLL_MIN, poll_max=POLL_MAX, t=t, lang=lang, languages=LANGUAGES, lang_flags=LANG_FLAGS, server_tz=tz_name, server_tz_offset=tz_offset, modem_types=modem_types, timezones=_get_iana_timezones(), iana_tz=iana_tz)
+    return render_template("setup.html", config=config, poll_min=POLL_MIN, poll_max=POLL_MAX, t=t, lang=lang, languages=LANGUAGES, lang_flags=LANG_FLAGS, server_tz=tz_name, server_tz_offset=tz_offset, modem_types=modem_types, driver_hints=driver_hints, timezones=_get_iana_timezones(), iana_tz=iana_tz)
 
 
 @app.route("/settings")
@@ -699,12 +700,13 @@ def settings():
     tz_name, tz_offset = _server_tz_info()
     from .drivers import driver_registry
     modem_types = driver_registry.get_available_drivers()
+    driver_hints = driver_registry.get_driver_hints()
     demo_mode = _config_manager.is_demo_mode() if _config_manager else False
     iana_tz = _guess_iana_timezone()
     # Warn if server TZ looks like a POSIX abbreviation (no DST support)
     tz_is_posix = bool(tz_name) and "/" not in tz_name and tz_name not in ("UTC",)
     all_modules = _module_loader.get_modules() if _module_loader else []
-    return render_template("settings.html", config=config, theme=theme, poll_min=POLL_MIN, poll_max=POLL_MAX, t=t, lang=lang, languages=LANGUAGES, lang_flags=LANG_FLAGS, server_tz=tz_name, server_tz_offset=tz_offset, modem_types=modem_types, demo_mode=demo_mode, timezones=_get_iana_timezones(), iana_tz=iana_tz, tz_is_posix=tz_is_posix, all_modules=all_modules)
+    return render_template("settings.html", config=config, theme=theme, poll_min=POLL_MIN, poll_max=POLL_MAX, t=t, lang=lang, languages=LANGUAGES, lang_flags=LANG_FLAGS, server_tz=tz_name, server_tz_offset=tz_offset, modem_types=modem_types, driver_hints=driver_hints, demo_mode=demo_mode, timezones=_get_iana_timezones(), iana_tz=iana_tz, tz_is_posix=tz_is_posix, all_modules=all_modules)
 
 
 @app.after_request

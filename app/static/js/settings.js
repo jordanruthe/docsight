@@ -811,7 +811,9 @@ function _createBrowseItem(label, targetPath, iconName, isMuted) {
     return div;
 }
 
-/* ── Username Field Toggle + Modem Defaults ── */
+/* ── Username Field Toggle + Modem Defaults (data-driven) ── */
+var DEFAULT_URL = 'http://192.168.178.1';
+
 function toggleUsernameField() {
     var modemType = document.getElementById('modem_type');
     if (!modemType) return;
@@ -819,8 +821,9 @@ function toggleUsernameField() {
     var usernameField = document.getElementById('modem_user');
     var urlField = document.getElementById('modem_url');
     var passwordField = document.getElementById('modem_password');
+    var hints = (typeof DRIVER_HINTS !== 'undefined' && DRIVER_HINTS[modemType.value]) || {};
 
-    // Fields to hide for generic driver (URL, username, password, test button)
+    // Fields to hide when credentials not required (e.g. generic driver)
     var credFields = [urlField, usernameField, passwordField].map(function(f) {
         return f ? f.closest('.form-field') : null;
     });
@@ -828,7 +831,7 @@ function toggleUsernameField() {
     var testBtnParent = testBtn ? testBtn.parentElement : null;
     var testResult = document.getElementById('modem-test');
 
-    if (modemType.value === 'generic') {
+    if (hints.credentials_required === false) {
         credFields.forEach(function(el) { if (el) el.style.display = 'none'; });
         if (testBtnParent) testBtnParent.style.display = 'none';
         if (testResult) testResult.style.display = 'none';
@@ -837,7 +840,13 @@ function toggleUsernameField() {
     credFields.forEach(function(el) { if (el) el.style.display = ''; });
     if (testBtnParent) testBtnParent.style.display = '';
 
-    if (modemType.value === 'ultrahub7') {
+    // URL default: apply if field is empty or still shows the global default
+    if (hints.default_url && urlField && (!urlField.value || urlField.value === DEFAULT_URL)) {
+        urlField.value = hints.default_url;
+    }
+
+    // Username handling
+    if (hints.username_required === false) {
         usernameField.disabled = true;
         usernameField.value = '';
         usernameField.placeholder = T.not_required || 'Not required for this modem';
@@ -847,24 +856,9 @@ function toggleUsernameField() {
         usernameField.disabled = false;
         usernameField.style.opacity = '1';
         usernameField.style.cursor = 'text';
-        if (modemType.value === 'vodafone_station') {
-            if (urlField && (!urlField.value || urlField.value === 'http://192.168.178.1')) {
-                urlField.value = 'http://192.168.0.1';
-            }
-            if (!usernameField.value) usernameField.value = 'admin';
-            usernameField.placeholder = 'admin';
-        } else if (modemType.value === 'tc4400') {
-            if (urlField && (!urlField.value || urlField.value === 'http://192.168.178.1')) {
-                urlField.value = 'http://192.168.100.1';
-            }
-            if (!usernameField.value) usernameField.value = 'admin';
-            usernameField.placeholder = 'admin';
-        } else if (modemType.value === 'cm3500') {
-            if (urlField && (!urlField.value || urlField.value === 'http://192.168.178.1')) {
-                urlField.value = 'https://192.168.100.1';
-            }
-            if (!usernameField.value) usernameField.value = 'admin';
-            usernameField.placeholder = 'admin';
+        if (hints.default_user) {
+            if (!usernameField.value) usernameField.value = hints.default_user;
+            usernameField.placeholder = hints.default_user;
         } else {
             usernameField.placeholder = 'admin';
         }
