@@ -1,8 +1,27 @@
 """Integration tests for the GET /metrics HTTP endpoint."""
 
 import pytest
+import app.web as _web
 from app.web import app, update_state, init_config, init_storage
 from app.config import ConfigManager
+
+
+@pytest.fixture(autouse=True)
+def reset_web_state():
+    """Reset shared web state before and after each test to prevent state pollution."""
+    _web._state["analysis"] = None
+    _web._state["last_update"] = None
+    _web._state["error"] = None
+    _web._state["connection_info"] = None
+    _web._state["device_info"] = None
+    _web._state["speedtest_latest"] = None
+    yield
+    _web._state["analysis"] = None
+    _web._state["last_update"] = None
+    _web._state["error"] = None
+    _web._state["connection_info"] = None
+    _web._state["device_info"] = None
+    _web._state["speedtest_latest"] = None
 
 
 @pytest.fixture
