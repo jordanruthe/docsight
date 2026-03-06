@@ -1218,7 +1218,9 @@
 <div id="view-channels" class="view">
     <div class="trend-header" style="margin-bottom:12px;">
         <span class="trend-title">{{ t.channels }}</span>
-        <div class="trend-tabs" id="channel-mode-tabs" style="margin-left:auto;">
+    </div>
+    <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
+        <div class="trend-tabs" id="channel-mode-tabs">
             <button class="trend-tab active" data-value="timeline" onclick="selectPill(this, switchChannelMode)">{{ t.channel_timeline }}</button>
             <button class="trend-tab" data-value="compare" onclick="selectPill(this, switchChannelMode)">{{ t.channel_compare }}</button>
         </div>
