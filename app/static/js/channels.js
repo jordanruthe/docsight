@@ -7,13 +7,19 @@ function switchChannelMode() {
     var mode = getPillValue('channel-mode-tabs') || 'timeline';
     var timelinePanel = document.getElementById('channel-panel-timeline');
     var comparePanel = document.getElementById('channel-panel-compare');
+    var timelineControls = document.getElementById('channel-timeline-controls');
+    var compareControls = document.getElementById('channel-compare-controls');
     if (mode === 'compare') {
         timelinePanel.style.display = 'none';
         comparePanel.style.display = '';
+        if (timelineControls) timelineControls.style.display = 'none';
+        if (compareControls) compareControls.style.display = 'contents';
         loadCompareChannelList();
     } else {
         timelinePanel.style.display = '';
         comparePanel.style.display = 'none';
+        if (timelineControls) timelineControls.style.display = 'contents';
+        if (compareControls) compareControls.style.display = 'none';
     }
 }
 window.switchChannelMode = switchChannelMode;

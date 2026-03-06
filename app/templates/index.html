@@ -1224,11 +1224,7 @@
             <button class="trend-tab active" data-value="timeline" onclick="selectPill(this, switchChannelMode)">{{ t.channel_timeline }}</button>
             <button class="trend-tab" data-value="compare" onclick="selectPill(this, switchChannelMode)">{{ t.channel_compare }}</button>
         </div>
-    </div>
-
-    <!-- ── Timeline Sub-View ── -->
-    <div id="channel-panel-timeline">
-        <div class="channel-filters" style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center;">
+        <span id="channel-timeline-controls" style="display:contents;">
             <select id="channel-select" class="channel-select-styled" onchange="loadChannelTimeline()">
                 <option value="">{{ t.select_channel }}</option>
             </select>
@@ -1238,7 +1234,25 @@
                 <button class="trend-tab active" data-value="7" onclick="selectPill(this, loadChannelTimeline)">7d</button>
                 <button class="trend-tab" data-value="30" onclick="selectPill(this, loadChannelTimeline)">30d</button>
             </div>
-        </div>
+        </span>
+        <span id="channel-compare-controls" style="display:none;">
+            <div class="trend-tabs" id="compare-dir-tabs">
+                <button class="trend-tab active" data-value="ds" onclick="selectPill(this, onCompareDirectionChange)">{{ t.downstream }}</button>
+                <button class="trend-tab" data-value="us" onclick="selectPill(this, onCompareDirectionChange)">{{ t.upstream }}</button>
+            </div>
+            <select id="compare-channel-select"><option value="">{{ t.select_channel }}</option></select>
+            <button class="compare-add-btn" onclick="addCompareChannel()">+ {{ t.add_channel }}</button>
+            <div class="trend-tabs" id="compare-time-tabs">
+                <button class="trend-tab" data-value="1" onclick="selectPill(this, loadCompareCharts)">1d</button>
+                <button class="trend-tab" data-value="3" onclick="selectPill(this, loadCompareCharts)">3d</button>
+                <button class="trend-tab active" data-value="7" onclick="selectPill(this, loadCompareCharts)">7d</button>
+                <button class="trend-tab" data-value="30" onclick="selectPill(this, loadCompareCharts)">30d</button>
+            </div>
+        </span>
+    </div>
+
+    <!-- ── Timeline Sub-View ── -->
+    <div id="channel-panel-timeline">
         <div id="channel-loading" class="waiting" style="display:none;">
             <div class="spinner"></div>
         </div>
@@ -1288,22 +1302,6 @@
 
     <!-- ── Compare Sub-View ── -->
     <div id="channel-panel-compare" style="display:none;">
-        <div class="compare-controls">
-            <div class="trend-tabs" id="compare-dir-tabs">
-                <button class="trend-tab active" data-value="ds" onclick="selectPill(this, onCompareDirectionChange)">{{ t.downstream }}</button>
-                <button class="trend-tab" data-value="us" onclick="selectPill(this, onCompareDirectionChange)">{{ t.upstream }}</button>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <select id="compare-channel-select"><option value="">{{ t.select_channel }}</option></select>
-                <button class="compare-add-btn" onclick="addCompareChannel()">+ {{ t.add_channel }}</button>
-            </div>
-            <div class="trend-tabs" id="compare-time-tabs">
-                <button class="trend-tab" data-value="1" onclick="selectPill(this, loadCompareCharts)">1d</button>
-                <button class="trend-tab" data-value="3" onclick="selectPill(this, loadCompareCharts)">3d</button>
-                <button class="trend-tab active" data-value="7" onclick="selectPill(this, loadCompareCharts)">7d</button>
-                <button class="trend-tab" data-value="30" onclick="selectPill(this, loadCompareCharts)">30d</button>
-            </div>
-        </div>
         <div id="compare-chips" class="compare-chips"></div>
         <div id="compare-empty" class="events-empty" style="display:none;"></div>
         <div id="compare-loading" class="waiting" style="display:none;">
