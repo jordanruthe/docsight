@@ -601,5 +601,22 @@
   "correlation_tt_errors": "Erreurs",
   "correlation_tt_download": "Téléchargement",
   "correlation_tt_upload": "Envoi",
-  "correlation_tt_event": "Événement"
+  "correlation_tt_event": "Événement",
+  "setup_welcome": "Configurez votre instance DOCSight",
+  "setup_fresh_desc": "Configurez une nouvelle instance DOCSight à partir de zéro",
+  "setup_restore_desc": "Téléchargez une sauvegarde précédente pour restaurer vos données",
+  "general_settings": "Paramètres généraux",
+  "general_settings_desc": "Configurer les options d'interrogation et d'affichage",
+  "modem_connection_desc": "Configurer la connexion au modem câble",
+  "review_settings": "Vérifier & Terminer",
+  "review_settings_desc": "Vérifiez votre configuration et terminez l'installation",
+  "poll_interval_desc": "Fréquence d'interrogation des données DOCSIS",
+  "minutes": "Minutes",
+  "saving": "Enregistrement...",
+  "setup_failed": "Échec de l'installation. Veuillez réessayer.",
+  "connection_successful": "Connexion réussie !",
+  "connection_failed": "Échec de la connexion",
+  "theme_toggle": "Thème",
+  "invalid_backup": "Fichier de sauvegarde invalide",
+  "restore_failed": "Échec de la restauration"
 }

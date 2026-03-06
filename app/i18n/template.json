@@ -586,5 +586,22 @@
   "correlation_tt_errors": "",
   "correlation_tt_download": "",
   "correlation_tt_upload": "",
-  "correlation_tt_event": ""
+  "correlation_tt_event": "",
+  "setup_welcome": "",
+  "setup_fresh_desc": "",
+  "setup_restore_desc": "",
+  "general_settings": "",
+  "general_settings_desc": "",
+  "modem_connection_desc": "",
+  "review_settings": "",
+  "review_settings_desc": "",
+  "poll_interval_desc": "",
+  "minutes": "",
+  "saving": "",
+  "setup_failed": "",
+  "connection_successful": "",
+  "connection_failed": "",
+  "theme_toggle": "",
+  "invalid_backup": "",
+  "restore_failed": ""
 }

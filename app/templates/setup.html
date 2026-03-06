@@ -8,394 +8,114 @@
     <link rel="icon" type="image/png" href="/static/icon.png">
     <link rel="apple-touch-icon" href="/static/icon.png">
     <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#a855f7">
+    <meta name="theme-color" content="#7c3aed">
     <link rel="stylesheet" href="/static/css/fonts.css">
     <link rel="stylesheet" href="/static/css/tokens.css">
-    <link rel="stylesheet" href="/static/css/main.css">
-    <style>
-        /* Setup-specific styles using v2 design language */
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        /* ── Header ── */
-        .setup-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-        }
-        .setup-title {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent) 0%, #ec4899 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-        .setup-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        /* ── Language/Theme Controls ── */
-        .controls-bar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .control-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 8px 16px;
-            color: var(--text);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .control-btn:hover {
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        /* ── Stepper (v2 Purple Style) ── */
-        .stepper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 40px;
-            padding: 0 20px;
-        }
-        .stepper-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            flex: 1;
-            max-width: 200px;
-        }
-        .stepper-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-            border: 2px solid var(--card-border);
-            background: var(--card-bg);
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
-        }
-        .stepper-step.active .stepper-circle {
-            background: linear-gradient(135deg, var(--accent) 0%, #ec4899 100%);
-            border-color: transparent;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(168,85,247,0.4);
-        }
-        .stepper-step.done .stepper-circle {
-            background: var(--accent);
-            border-color: transparent;
-            color: #fff;
-        }
-        .stepper-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-align: center;
-        }
-        .stepper-step.active .stepper-label {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .stepper-line {
-            height: 2px;
-            background: var(--card-border);
-            flex: 1;
-            position: relative;
-            top: -20px;
-            margin: 0 -10px;
-        }
-        .stepper-step.done + .stepper-line {
-            background: var(--accent);
-        }
-
-        /* ── Content Cards ── */
-        .step-content {
-            display: none;
-        }
-        .step-content.active {
-            display: block;
-            animation: fadeInUp 0.3s ease-out;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .setup-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            margin-bottom: 20px;
-            border: 1px solid var(--card-border);
-            transition: all 0.2s;
-        }
-        .setup-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 4px 16px rgba(168,85,247,0.12);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--card-border);
-        }
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            background: rgba(168,85,247,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-        .card-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        /* ── Form Elements ── */
-        .form-row {
-            margin-bottom: 20px;
-        }
-        .form-row label {
-            display: block;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .form-row input,
-        .form-row select {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--input-border);
-            border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            color: var(--text);
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        .form-row input:focus,
-        .form-row select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
-        }
-        .form-row input[type="password"] {
-            font-family: monospace;
-        }
-
-        /* ── Info Box ── */
-        .info-box {
-            background: rgba(168,85,247,0.08);
-            border: 1px solid rgba(168,85,247,0.2);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        .info-box strong {
-            color: var(--accent);
-        }
-
-        /* ── Buttons ── */
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 28px;
-        }
-        .btn {
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-family: inherit;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent) 0%, #ec4899 100%);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(168,85,247,0.3);
-        }
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(168,85,247,0.4);
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background: var(--card-bg);
-            color: var(--text);
-            border: 1px solid var(--card-border);
-        }
-        .btn-secondary:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        .btn-test {
-            background: rgba(76,175,80,0.15);
-            color: #4caf50;
-            border: 1px solid rgba(76,175,80,0.3);
-        }
-        .btn-test:hover {
-            background: rgba(76,175,80,0.25);
-        }
-
-        /* ── Test Result ── */
-        .test-result {
-            margin-top: 16px;
-            padding: 14px;
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            display: none;
-        }
-        .test-result.success {
-            background: rgba(76,175,80,0.15);
-            border: 1px solid rgba(76,175,80,0.3);
-            color: #4caf50;
-        }
-        .test-result.error {
-            background: rgba(244,67,54,0.15);
-            border: 1px solid rgba(244,67,54,0.3);
-            color: #f44336;
-        }
-
-        /* ── Mobile Responsive ── */
-        @media (max-width: 768px) {
-            .setup-title { font-size: 1.5rem; }
-            .stepper { padding: 0; }
-            .stepper-circle { width: 40px; height: 40px; font-size: 0.95rem; }
-            .stepper-label { font-size: 0.75rem; }
-            .setup-card { padding: 20px; }
-            .button-group { flex-direction: column; }
-            .btn { width: 100%; }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/setup.css">
+    <script src="/static/vendor/lucide.min.js"></script>
 </head>
 <body>
 
+<div class="mesh-bg"></div>
+
+<div class="setup-layout">
+
 <!-- Controls Bar -->
-<div class="controls-bar">
-    <select class="control-btn" id="lang-select" onchange="location.href='?lang='+this.value">
+<div class="setup-controls">
+    <select class="btn btn-ghost" id="lang-select" onchange="location.href='?lang='+this.value" style="padding:8px 12px;font-size:0.82rem;">
         {% for code, name in languages.items() %}
         <option value="{{ code }}" {% if code == lang %}selected{% endif %}>{{ lang_flags.get(code, '') }} {{ name }}</option>
         {% endfor %}
     </select>
-    <button class="control-btn" onclick="toggleTheme()">🌓 Theme</button>
+    <button class="btn btn-ghost" onclick="toggleTheme()" style="gap:6px;">
+        <i data-lucide="sun-moon" style="width:16px;height:16px;"></i> {{ t.theme_toggle }}
+    </button>
 </div>
 
 <!-- Header -->
 <div class="setup-header">
     <h1 class="setup-title">{{ t.initial_setup }}</h1>
-    <p class="setup-subtitle">{{ t.setup_welcome|default('Configure your DOCSight instance') }}</p>
+    <p class="setup-subtitle">{{ t.setup_welcome }}</p>
 </div>
 
 <!-- Start Choice -->
 <div id="setup-start" class="step-content active">
-    <div class="setup-card" style="text-align:center;padding:40px 28px;">
-        <div style="font-size:2.5rem;margin-bottom:16px;">🚀</div>
-        <div class="card-title" style="font-size:1.25rem;margin-bottom:8px;">{{ t.setup_start_title|default('How would you like to start?') }}</div>
-        <div class="card-desc" style="margin-bottom:32px;">{{ t.setup_start_desc|default('Set up a new instance or restore from a previous backup.') }}</div>
-        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
-            <button type="button" class="btn btn-primary" onclick="startFreshSetup()" style="min-width:200px;">
-                ⚙️ {{ t.setup_fresh|default('New Setup') }}
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="startRestore()" style="min-width:200px;">
-                📦 {{ t.setup_restore|default('Restore from Backup') }}
-            </button>
+    <div class="choice-grid">
+        <div class="choice-card glass" onclick="startFreshSetup()" role="button" tabindex="0">
+            <div class="card-icon purple">
+                <i data-lucide="settings"></i>
+            </div>
+            <div class="card-title">{{ t.setup_fresh }}</div>
+            <div class="card-desc">{{ t.setup_fresh_desc }}</div>
+        </div>
+        <div class="choice-card glass" onclick="startRestore()" role="button" tabindex="0">
+            <div class="card-icon blue">
+                <i data-lucide="archive-restore"></i>
+            </div>
+            <div class="card-title">{{ t.setup_restore }}</div>
+            <div class="card-desc">{{ t.setup_restore_desc }}</div>
         </div>
     </div>
+    <p class="setup-subtitle" style="text-align:center;">{{ t.setup_start_desc }}</p>
 </div>
 
 <!-- Restore UI -->
 <div id="restore-section" style="display:none;">
-    <div class="setup-card">
+    <div class="settings-card glass">
         <div class="card-header">
-            <div class="card-icon">📦</div>
-            <div>
-                <div class="card-title">{{ t.restore_title|default('Restore from Backup') }}</div>
-                <div class="card-desc">{{ t.restore_desc|default('Upload a DOCSight backup file to restore your data.') }}</div>
+            <div class="card-title-group">
+                <div class="card-icon blue">
+                    <i data-lucide="archive-restore"></i>
+                </div>
+                <div>
+                    <div class="card-title">{{ t.restore_title }}</div>
+                    <div class="card-subtitle">{{ t.restore_desc }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="form-row">
-            <label for="restore-file">{{ t.restore_select_file|default('Select backup file (.tar.gz)') }}</label>
-            <input type="file" id="restore-file" accept=".tar.gz,.gz" style="padding:10px;" onchange="validateRestoreFile()">
+        <div class="form-grid">
+            <div class="form-field">
+                <label class="form-label" for="restore-file">{{ t.restore_select_file }}</label>
+                <input class="form-input" type="file" id="restore-file" accept=".tar.gz,.gz" onchange="validateRestoreFile()" style="padding:10px;">
+            </div>
         </div>
 
         <div id="restore-meta" style="display:none;">
-            <div class="info-box" id="restore-meta-info"></div>
+            <div class="setup-info" id="restore-meta-info"></div>
             <button type="button" class="btn btn-primary" onclick="doRestore()" id="restore-confirm-btn">
-                📦 {{ t.restore_confirm|default('Restore Backup') }}
+                <i data-lucide="archive-restore" style="width:16px;height:16px;"></i>
+                {{ t.restore_confirm }}
             </button>
         </div>
 
         <div class="test-result" id="restore-result"></div>
 
-        <div class="button-group" style="margin-top:20px;">
-            <button type="button" class="btn btn-secondary" onclick="backToStart()">
-                ← {{ t.back|default('Back') }}
+        <div class="setup-actions" style="margin-top:var(--space-md);">
+            <button type="button" class="btn btn-ghost" onclick="backToStart()">
+                <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+                {{ t.back }}
             </button>
         </div>
     </div>
 </div>
 
 <!-- Stepper -->
-<div class="stepper" id="setup-stepper" style="display:none;">
+<div class="setup-stepper" id="setup-stepper" style="display:none;">
     <div class="stepper-step active" data-step="1">
-        <div class="stepper-circle">1</div>
-        <span class="stepper-label">{{ t.modem_connection|default('Modem') }}</span>
+        <div class="stepper-circle"><i data-lucide="radio" style="width:20px;height:20px;"></i></div>
+        <span class="stepper-label">{{ t.modem_connection }}</span>
     </div>
     <div class="stepper-line"></div>
     <div class="stepper-step" data-step="2">
-        <div class="stepper-circle">2</div>
-        <span class="stepper-label">{{ t.settings|default('Settings') }}</span>
+        <div class="stepper-circle"><i data-lucide="sliders-horizontal" style="width:20px;height:20px;"></i></div>
+        <span class="stepper-label">{{ t.settings }}</span>
     </div>
     <div class="stepper-line"></div>
     <div class="stepper-step" data-step="3">
-        <div class="stepper-circle">3</div>
-        <span class="stepper-label">{{ t.review|default('Review') }}</span>
+        <div class="stepper-circle"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></div>
+        <span class="stepper-label">{{ t.step_review }}</span>
     </div>
 </div>
 
@@ -403,55 +123,65 @@
 
 <!-- Step 1: Modem Connection -->
 <div class="step-content active" data-step="1">
-    <div class="setup-card">
+    <div class="settings-card glass">
         <div class="card-header">
-            <div class="card-icon">📡</div>
-            <div>
-                <div class="card-title">{{ t.modem_connection }}</div>
-                <div class="card-desc">{{ t.modem_connection_desc|default('Configure your cable modem connection') }}</div>
+            <div class="card-title-group">
+                <div class="card-icon purple">
+                    <i data-lucide="radio"></i>
+                </div>
+                <div>
+                    <div class="card-title">{{ t.modem_connection }}</div>
+                    <div class="card-subtitle">{{ t.modem_connection_desc }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="form-row">
-            <label for="modem_type">{{ t.modem_type }}</label>
-            <select id="modem_type" name="modem_type" required>
-                {% for key, name in modem_types %}
-                <option value="{{ key }}" {% if config.modem_type == key %}selected{% endif %}>{{ name }}</option>
-                {% endfor %}
-            </select>
+        <div class="form-grid">
+            <div class="form-field">
+                <label class="form-label" for="modem_type">{{ t.modem_type }}</label>
+                <select class="form-select" id="modem_type" name="modem_type" required>
+                    {% for key, name in modem_types %}
+                    <option value="{{ key }}" {% if config.modem_type == key %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
 
-        <div id="modem-credentials-group">
-            <div class="form-row">
-                <label for="modem_url">{{ t.modem_url }}</label>
-                <input type="text" id="modem_url" name="modem_url"
+        <div id="modem-credentials-group" class="form-grid" style="margin-top:var(--space-md);">
+            <div class="form-field">
+                <label class="form-label" for="modem_url">{{ t.url }}</label>
+                <input class="form-input" type="text" id="modem_url" name="modem_url"
                        value="{{ config.modem_url or 'http://192.168.178.1' }}"
                        placeholder="http://192.168.178.1">
             </div>
 
-            <div class="form-row">
-                <label for="modem_user">{{ t.username }}</label>
-                <input type="text" id="modem_user" name="modem_user"
+            <div class="form-field">
+                <label class="form-label" for="modem_user">{{ t.username }}</label>
+                <input class="form-input" type="text" id="modem_user" name="modem_user"
                        value="{{ config.modem_user or '' }}"
                        placeholder="admin">
             </div>
 
-            <div class="form-row">
-                <label for="modem_password">{{ t.password }}</label>
-                <input type="password" id="modem_password" name="modem_password"
+            <div class="form-field">
+                <label class="form-label" for="modem_password">{{ t.password }}</label>
+                <input class="form-input" type="password" id="modem_password" name="modem_password"
                        value="{{ config.modem_password or '' }}"
                        placeholder="••••••••">
             </div>
 
-            <button type="button" class="btn btn-test" onclick="testConnection()">
-                🔌 {{ t.test_connection }}
-            </button>
-            <div class="test-result" id="test-result"></div>
+            <div>
+                <button type="button" class="btn btn-ghost" onclick="testConnection()" id="test-conn-btn">
+                    <i data-lucide="wifi" style="width:16px;height:16px;"></i>
+                    {{ t.test_connection }}
+                </button>
+                <div class="test-result" id="test-result"></div>
+            </div>
         </div>
 
-        <div class="button-group">
+        <div class="setup-actions">
             <button type="button" class="btn btn-primary" onclick="nextStep(2)">
-                {{ t.next|default('Next') }} →
+                {{ t.next }}
+                <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
             </button>
         </div>
     </div>
@@ -459,43 +189,47 @@
 
 <!-- Step 2: Settings -->
 <div class="step-content" data-step="2">
-    <div class="setup-card">
+    <div class="settings-card glass">
         <div class="card-header">
-            <div class="card-icon">⚙️</div>
-            <div>
-                <div class="card-title">{{ t.general_settings }}</div>
-                <div class="card-desc">{{ t.general_settings_desc|default('Configure polling and display options') }}</div>
+            <div class="card-title-group">
+                <div class="card-icon blue">
+                    <i data-lucide="sliders-horizontal"></i>
+                </div>
+                <div>
+                    <div class="card-title">{{ t.general_settings }}</div>
+                    <div class="card-subtitle">{{ t.general_settings_desc }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="form-row">
-            <label for="poll_interval">{{ t.poll_interval }} ({{ t.minutes }})</label>
-            <input type="number" id="poll_interval" name="poll_interval" 
-                   min="{{ poll_min }}" max="{{ poll_max }}" 
-                   value="{{ config.poll_interval or 5 }}" required>
-            <small style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 4px; display: block;">
-                {{ t.poll_interval_desc|default('How often to fetch DOCSIS data (min: ' + poll_min|string + ', max: ' + poll_max|string + ')') }}
-            </small>
+        <div class="form-grid">
+            <div class="form-field">
+                <label class="form-label" for="poll_interval">{{ t.poll_interval }} ({{ t.minutes }})</label>
+                <input class="form-input" type="number" id="poll_interval" name="poll_interval"
+                       min="{{ poll_min }}" max="{{ poll_max }}"
+                       value="{{ config.poll_interval or 5 }}" required>
+                <span class="form-hint">{{ t.poll_interval_desc }} (min: {{ poll_min }}, max: {{ poll_max }})</span>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="timezone">{{ t.timezone }}</label>
+                <select class="form-select" id="timezone" name="timezone" required>
+                    {% for tz in timezones %}
+                    <option value="{{ tz }}" {% if (config.timezone or iana_tz) == tz %}selected{% endif %}>{{ tz }}</option>
+                    {% endfor %}
+                </select>
+                <span class="form-hint">{{ t.timezone_hint }}</span>
+            </div>
         </div>
 
-        <div class="form-row">
-            <label for="timezone">{{ t.timezone }}</label>
-            <select id="timezone" name="timezone" required>
-                {% for tz in timezones %}
-                <option value="{{ tz }}" {% if (config.timezone or iana_tz) == tz %}selected{% endif %}>{{ tz }}</option>
-                {% endfor %}
-            </select>
-            <small style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 4px; display: block;">
-                {{ t.timezone_hint }}
-            </small>
-        </div>
-
-        <div class="button-group">
-            <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
-                ← {{ t.back|default('Back') }}
+        <div class="setup-actions">
+            <button type="button" class="btn btn-ghost" onclick="prevStep(1)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+                {{ t.back }}
             </button>
             <button type="button" class="btn btn-primary" onclick="nextStep(3)">
-                {{ t.next|default('Next') }} →
+                {{ t.next }}
+                <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
             </button>
         </div>
     </div>
@@ -503,28 +237,34 @@
 
 <!-- Step 3: Review -->
 <div class="step-content" data-step="3">
-    <div class="setup-card">
+    <div class="settings-card glass">
         <div class="card-header">
-            <div class="card-icon">✓</div>
-            <div>
-                <div class="card-title">{{ t.review_settings|default('Review & Complete') }}</div>
-                <div class="card-desc">{{ t.review_settings_desc|default('Review your configuration and complete setup') }}</div>
+            <div class="card-title-group">
+                <div class="card-icon purple">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div>
+                    <div class="card-title">{{ t.review_settings }}</div>
+                    <div class="card-subtitle">{{ t.review_settings_desc }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="info-box">
+        <div class="setup-info">
             <strong>{{ t.modem_connection }}:</strong><br>
             <span id="review-modem-type"></span> @ <span id="review-modem-url"></span><br><br>
             <strong>{{ t.poll_interval }}:</strong> <span id="review-poll"></span> {{ t.minutes }}<br>
             <strong>{{ t.timezone }}:</strong> <span id="review-tz"></span>
         </div>
 
-        <div class="button-group">
-            <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
-                ← {{ t.back|default('Back') }}
+        <div class="setup-actions">
+            <button type="button" class="btn btn-ghost" onclick="prevStep(2)">
+                <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+                {{ t.back }}
             </button>
             <button type="submit" class="btn btn-primary" id="submit-btn">
-                ✓ {{ t.complete_setup|default('Complete Setup') }}
+                <i data-lucide="check-circle" style="width:16px;height:16px;"></i>
+                {{ t.complete_setup }}
             </button>
         </div>
     </div>
@@ -532,28 +272,26 @@
 
 </form>
 
+</div><!-- /.setup-layout -->
+
 <script>
 let currentStep = 1;
 
 function nextStep(step) {
-    // Hide current
     document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.stepper-step').forEach(el => el.classList.remove('active'));
-    
-    // Mark previous as done
+
     for(let i = 1; i < step; i++) {
         document.querySelector(`.stepper-step[data-step="${i}"]`).classList.add('done');
     }
-    
-    // Show new
+
     document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
     document.querySelector(`.stepper-step[data-step="${step}"]`).classList.add('active');
-    
-    // Update review if step 3
+
     if(step === 3) {
         updateReview();
     }
-    
+
     currentStep = step;
     window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -565,99 +303,110 @@ function prevStep(step) {
 function updateReview() {
     const modemType = document.getElementById('modem_type');
     const selectedOption = modemType.options[modemType.selectedIndex].text;
-    
+
     document.getElementById('review-modem-type').textContent = selectedOption;
     document.getElementById('review-modem-url').textContent = document.getElementById('modem_url').value;
     document.getElementById('review-poll').textContent = document.getElementById('poll_interval').value;
     document.getElementById('review-tz').textContent = document.getElementById('timezone').value;
 }
 
+function _setButtonLoading(btn, iconName, text) {
+    while (btn.firstChild) btn.removeChild(btn.firstChild);
+    var icon = document.createElement('i');
+    icon.setAttribute('data-lucide', iconName);
+    icon.style.cssText = 'width:16px;height:16px;';
+    if (iconName === 'loader-2') icon.classList.add('spin');
+    btn.appendChild(icon);
+    btn.appendChild(document.createTextNode(' ' + text));
+    lucide.createIcons({nodes: [btn]});
+}
+
 async function testConnection() {
-    const btn = event.target;
-    const resultDiv = document.getElementById('test-result');
-    
+    var btn = document.getElementById('test-conn-btn');
+    var resultDiv = document.getElementById('test-result');
+
     btn.disabled = true;
-    btn.textContent = '⏳ {{ t.testing|default("Testing...") }}';
+    _setButtonLoading(btn, 'loader-2', '{{ t.testing }}');
     resultDiv.style.display = 'none';
-    
+
     try {
-        const data = {
+        var data = {
             modem_type: document.getElementById('modem_type').value,
             modem_url: document.getElementById('modem_url').value,
             modem_user: document.getElementById('modem_user').value,
             modem_password: document.getElementById('modem_password').value
         };
-        
-        const response = await fetch('/api/test-modem', {
+
+        var response = await fetch('/api/test-modem', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         });
-        
-        const result = await response.json();
-        
+
+        var result = await response.json();
+
         if(result.success) {
             resultDiv.className = 'test-result success';
-            resultDiv.textContent = '✓ ' + (result.message || '{{ t.connection_successful|default("Connection successful!") }}');
+            resultDiv.textContent = '✓ ' + (result.message || '{{ t.connection_successful }}');
         } else {
             resultDiv.className = 'test-result error';
-            resultDiv.textContent = '✗ ' + (result.error || '{{ t.connection_failed|default("Connection failed") }}');
+            resultDiv.textContent = '✗ ' + (result.error || '{{ t.connection_failed }}');
         }
         resultDiv.style.display = 'block';
     } catch(err) {
         resultDiv.className = 'test-result error';
-        resultDiv.textContent = '✗ {{ t.connection_error|default("Network error") }}: ' + err.message;
+        resultDiv.textContent = '✗ {{ t.network_error }}: ' + err.message;
         resultDiv.style.display = 'block';
     }
-    
+
     btn.disabled = false;
-    btn.textContent = '🔌 {{ t.test_connection }}';
+    _setButtonLoading(btn, 'wifi', '{{ t.test_connection }}');
 }
 
 // Form submission
 document.getElementById('setup-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
-    const btn = document.getElementById('submit-btn');
+
+    var btn = document.getElementById('submit-btn');
     btn.disabled = true;
-    btn.textContent = '⏳ {{ t.saving|default("Saving...") }}';
-    
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData.entries());
-    
+    _setButtonLoading(btn, 'loader-2', '{{ t.saving }}');
+
+    var formData = new FormData(e.target);
+    var data = Object.fromEntries(formData.entries());
+
     try {
-        const response = await fetch('/api/config', {
+        var response = await fetch('/api/config', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         });
-        
+
         if(response.ok) {
             window.location.href = '/';
         } else {
-            alert('{{ t.setup_failed|default("Setup failed. Please try again.") }}');
+            alert('{{ t.setup_failed }}');
             btn.disabled = false;
-            btn.textContent = '✓ {{ t.complete_setup|default("Complete Setup") }}';
+            _setButtonLoading(btn, 'check-circle', '{{ t.complete_setup }}');
         }
     } catch(err) {
-        alert('{{ t.setup_error|default("Error") }}: ' + err.message);
+        alert('{{ t.error_generic }}: ' + err.message);
         btn.disabled = false;
-        btn.textContent = '✓ {{ t.complete_setup|default("Complete Setup") }}';
+        _setButtonLoading(btn, 'check-circle', '{{ t.complete_setup }}');
     }
 });
 
 // Theme toggle
 function toggleTheme() {
-    const html = document.documentElement;
-    const current = html.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
 }
 
 // Load theme preference
 (function() {
-    const saved = localStorage.getItem('theme');
+    var saved = localStorage.getItem('theme');
     if(saved) {
         document.documentElement.setAttribute('data-theme', saved);
     }
@@ -666,7 +415,7 @@ function toggleTheme() {
 // Driver hints (data-driven UI defaults)
 var DRIVER_HINTS = {{ driver_hints | tojson }};
 var DEFAULT_URL = 'http://192.168.178.1';
-var NOT_REQUIRED_TEXT = '{{ t.not_required|default("Not required for this modem") }}';
+var NOT_REQUIRED_TEXT = '{{ t.not_required }}';
 
 function toggleUsernameField() {
     var modemType = document.getElementById('modem_type').value;
@@ -675,19 +424,16 @@ function toggleUsernameField() {
     var credGroup = document.getElementById('modem-credentials-group');
     var hints = DRIVER_HINTS[modemType] || {};
 
-    // Hide credentials group when not required (e.g. generic router)
     if(hints.credentials_required === false) {
         credGroup.style.display = 'none';
         return;
     }
-    credGroup.style.display = '';
+    credGroup.style.display = 'grid';
 
-    // URL default: apply if field is empty or still shows the global default
     if(hints.default_url && (!urlField.value || urlField.value === DEFAULT_URL)) {
         urlField.value = hints.default_url;
     }
 
-    // Username handling
     if(hints.username_required === false) {
         usernameField.disabled = true;
         usernameField.value = '';
@@ -711,6 +457,7 @@ function toggleUsernameField() {
 document.addEventListener('DOMContentLoaded', function() {
     toggleUsernameField();
     document.getElementById('modem_type').addEventListener('change', toggleUsernameField);
+    lucide.createIcons();
 });
 
 /* ── Setup Start Choice ── */
@@ -730,7 +477,7 @@ function backToStart() {
     document.getElementById('setup-stepper').style.display = 'none';
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('setup-start').style.display = '';
-    // Reset restore state
+    document.getElementById('setup-start').classList.add('active');
     document.getElementById('restore-file').value = '';
     document.getElementById('restore-meta').style.display = 'none';
     document.getElementById('restore-result').style.display = 'none';
@@ -738,14 +485,65 @@ function backToStart() {
 
 /* ── Restore Flow ── */
 var T_setup = {
-    validating: '{{ t.restore_validating|default("Validating...")|e }}',
-    restoring: '{{ t.restore_restoring|default("Restoring...")|e }}',
-    success: '{{ t.restore_success|default("Restore complete! Redirecting...")|e }}',
-    version: '{{ t.restore_version|default("Version")|e }}',
-    date: '{{ t.restore_date|default("Date")|e }}',
-    tables: '{{ t.restore_tables|default("Tables")|e }}',
-    network_error: '{{ t.network_error|default("Network error")|e }}'
+    validating: '{{ t.restore_validating }}',
+    restoring: '{{ t.restore_restoring }}',
+    success: '{{ t.restore_success }}',
+    version: '{{ t.restore_version }}',
+    date: '{{ t.restore_date }}',
+    tables: '{{ t.restore_tables }}',
+    network_error: '{{ t.network_error }}'
 };
+
+function _showResultLoading(resultDiv, text) {
+    resultDiv.className = 'test-result';
+    resultDiv.style.display = 'block';
+    resultDiv.style.background = 'var(--amethyst-muted)';
+    resultDiv.style.border = '1px solid rgba(124,58,237,0.2)';
+    resultDiv.style.color = 'var(--text-secondary)';
+    // Build DOM nodes instead of innerHTML
+    while (resultDiv.firstChild) resultDiv.removeChild(resultDiv.firstChild);
+    var icon = document.createElement('i');
+    icon.setAttribute('data-lucide', 'loader-2');
+    icon.className = 'spin';
+    icon.style.cssText = 'width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;';
+    resultDiv.appendChild(icon);
+    resultDiv.appendChild(document.createTextNode(' ' + text));
+    lucide.createIcons({nodes: [resultDiv]});
+}
+
+function _showResultError(resultDiv, msg) {
+    resultDiv.className = 'test-result error';
+    resultDiv.style.background = '';
+    resultDiv.style.border = '';
+    resultDiv.style.color = '';
+    resultDiv.textContent = '✗ ' + msg;
+}
+
+function _buildMetaInfo(container, meta) {
+    while (container.firstChild) container.removeChild(container.firstChild);
+    var date = meta.timestamp ? new Date(meta.timestamp).toLocaleString() : '?';
+
+    var b1 = document.createElement('strong');
+    b1.textContent = T_setup.version + ':';
+    container.appendChild(b1);
+    container.appendChild(document.createTextNode(' ' + (meta.app_version || '?')));
+    container.appendChild(document.createElement('br'));
+
+    var b2 = document.createElement('strong');
+    b2.textContent = T_setup.date + ':';
+    container.appendChild(b2);
+    container.appendChild(document.createTextNode(' ' + date));
+
+    if (meta.tables) {
+        var tkeys = Object.keys(meta.tables);
+        var tables = tkeys.map(function(k) { return k + ': ' + meta.tables[k]; }).join(', ');
+        container.appendChild(document.createElement('br'));
+        var b3 = document.createElement('strong');
+        b3.textContent = T_setup.tables + ':';
+        container.appendChild(b3);
+        container.appendChild(document.createTextNode(' ' + tables));
+    }
+}
 
 async function validateRestoreFile() {
     var fileInput = document.getElementById('restore-file');
@@ -756,12 +554,7 @@ async function validateRestoreFile() {
 
     if (!fileInput.files.length) return;
 
-    resultDiv.className = 'test-result';
-    resultDiv.style.display = 'block';
-    resultDiv.style.background = 'rgba(168,85,247,0.08)';
-    resultDiv.style.border = '1px solid rgba(168,85,247,0.2)';
-    resultDiv.style.color = 'var(--text-secondary)';
-    resultDiv.textContent = '⏳ ' + T_setup.validating;
+    _showResultLoading(resultDiv, T_setup.validating);
 
     var formData = new FormData();
     formData.append('file', fileInput.files[0]);
@@ -772,31 +565,13 @@ async function validateRestoreFile() {
 
         if (res.valid) {
             resultDiv.style.display = 'none';
-            var meta = res.meta;
-            var date = meta.timestamp ? new Date(meta.timestamp).toLocaleString() : '?';
-            var tables = '';
-            if (meta.tables) {
-                var tkeys = Object.keys(meta.tables);
-                tables = tkeys.map(function(k) { return k + ': ' + meta.tables[k]; }).join(', ');
-            }
-            var info = document.getElementById('restore-meta-info');
-            info.innerHTML = '<strong>' + T_setup.version + ':</strong> ' + (meta.app_version || '?') +
-                '<br><strong>' + T_setup.date + ':</strong> ' + date +
-                (tables ? '<br><strong>' + T_setup.tables + ':</strong> ' + tables : '');
+            _buildMetaInfo(document.getElementById('restore-meta-info'), res.meta);
             metaDiv.style.display = '';
         } else {
-            resultDiv.className = 'test-result error';
-            resultDiv.style.background = '';
-            resultDiv.style.border = '';
-            resultDiv.style.color = '';
-            resultDiv.textContent = '✗ ' + (res.error || 'Invalid backup file');
+            _showResultError(resultDiv, res.error || '{{ t.invalid_backup }}');
         }
     } catch(err) {
-        resultDiv.className = 'test-result error';
-        resultDiv.style.background = '';
-        resultDiv.style.border = '';
-        resultDiv.style.color = '';
-        resultDiv.textContent = '✗ ' + T_setup.network_error + ': ' + err.message;
+        _showResultError(resultDiv, T_setup.network_error + ': ' + err.message);
     }
 }
 
@@ -808,12 +583,7 @@ async function doRestore() {
     if (!fileInput.files.length) return;
 
     btn.disabled = true;
-    resultDiv.className = 'test-result';
-    resultDiv.style.display = 'block';
-    resultDiv.style.background = 'rgba(168,85,247,0.08)';
-    resultDiv.style.border = '1px solid rgba(168,85,247,0.2)';
-    resultDiv.style.color = 'var(--text-secondary)';
-    resultDiv.textContent = '⏳ ' + T_setup.restoring;
+    _showResultLoading(resultDiv, T_setup.restoring);
 
     var formData = new FormData();
     formData.append('file', fileInput.files[0]);
@@ -831,7 +601,6 @@ async function doRestore() {
             if (res.configured) {
                 setTimeout(function() { window.location.href = '/'; }, 2000);
             } else {
-                // Data restored but modem not configured yet -- show setup stepper
                 setTimeout(function() {
                     document.getElementById('restore-section').style.display = 'none';
                     document.getElementById('setup-stepper').style.display = '';
@@ -839,19 +608,11 @@ async function doRestore() {
                 }, 2000);
             }
         } else {
-            resultDiv.className = 'test-result error';
-            resultDiv.style.background = '';
-            resultDiv.style.border = '';
-            resultDiv.style.color = '';
-            resultDiv.textContent = '✗ ' + (res.error || 'Restore failed');
+            _showResultError(resultDiv, res.error || '{{ t.restore_failed }}');
             btn.disabled = false;
         }
     } catch(err) {
-        resultDiv.className = 'test-result error';
-        resultDiv.style.background = '';
-        resultDiv.style.border = '';
-        resultDiv.style.color = '';
-        resultDiv.textContent = '✗ ' + T_setup.network_error + ': ' + err.message;
+        _showResultError(resultDiv, T_setup.network_error + ': ' + err.message);
         btn.disabled = false;
     }
 }
