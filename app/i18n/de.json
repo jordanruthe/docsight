@@ -609,5 +609,22 @@
   "correlation_tt_errors": "Fehler",
   "correlation_tt_download": "Download",
   "correlation_tt_upload": "Upload",
-  "correlation_tt_event": "Ereignis"
+  "correlation_tt_event": "Ereignis",
+  "setup_welcome": "Konfiguriere deine DOCSight-Instanz",
+  "setup_fresh_desc": "Richte eine neue DOCSight-Instanz von Grund auf ein",
+  "setup_restore_desc": "Lade ein vorheriges Backup hoch, um deine Daten wiederherzustellen",
+  "general_settings": "Allgemeine Einstellungen",
+  "general_settings_desc": "Abfrage- und Anzeigeoptionen konfigurieren",
+  "modem_connection_desc": "Kabelmodem-Verbindung konfigurieren",
+  "review_settings": "Überprüfen & Abschließen",
+  "review_settings_desc": "Konfiguration überprüfen und Setup abschließen",
+  "poll_interval_desc": "Wie oft DOCSIS-Daten abgefragt werden",
+  "minutes": "Minuten",
+  "saving": "Speichere...",
+  "setup_failed": "Einrichtung fehlgeschlagen. Bitte erneut versuchen.",
+  "connection_successful": "Verbindung erfolgreich!",
+  "connection_failed": "Verbindung fehlgeschlagen",
+  "theme_toggle": "Design",
+  "invalid_backup": "Ungültige Backup-Datei",
+  "restore_failed": "Wiederherstellung fehlgeschlagen"
 }

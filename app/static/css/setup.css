@@ -1,0 +1,351 @@
+/* setup.css — Setup Wizard (Tribu Design System) */
+
+/* ── Mesh Background ── */
+.mesh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.mesh-bg::before {
+  content: '';
+  position: absolute;
+  width: 800px; height: 800px;
+  top: -200px; right: -200px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--amethyst) 8%, transparent) 0%, transparent 70%);
+  animation: meshDrift1 25s ease-in-out infinite alternate;
+}
+.mesh-bg::after {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  bottom: -100px; left: -100px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--sapphire) 6%, transparent) 0%, transparent 70%);
+  animation: meshDrift2 30s ease-in-out infinite alternate;
+}
+@keyframes meshDrift1 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-80px,60px) scale(1.15)} }
+@keyframes meshDrift2 { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(60px,-40px) scale(1.1)} }
+
+/* ── Card Icon Colors ── */
+.card-icon.purple { background: rgba(124,58,237,0.15); color: var(--amethyst-light); }
+.card-icon.blue { background: rgba(59,130,246,0.15); color: var(--sapphire); }
+
+/* ── Layout ── */
+.setup-layout {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md);
+  min-height: 100vh;
+}
+
+/* ── Controls Bar (top-right) ── */
+.setup-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+/* ── Header ── */
+.setup-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+.setup-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-xs);
+}
+.setup-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* ── Stepper ── */
+.setup-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-2xl);
+  padding: 0 var(--space-lg);
+}
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  position: relative;
+  flex: 1;
+  max-width: 200px;
+}
+.stepper-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  transition: all 0.3s var(--ease-out-expo);
+  position: relative;
+  z-index: 2;
+}
+.stepper-circle svg { width: 20px; height: 20px; }
+.stepper-step.active .stepper-circle {
+  background: var(--grad-primary);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px -2px rgba(124, 58, 237, 0.4);
+}
+.stepper-step.done .stepper-circle {
+  background: var(--amethyst);
+  border-color: transparent;
+  color: #fff;
+}
+.stepper-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: center;
+}
+.stepper-step.active .stepper-label {
+  color: var(--amethyst-light);
+  font-weight: 600;
+}
+.stepper-line {
+  height: 2px;
+  background: var(--glass-border);
+  flex: 1;
+  position: relative;
+  top: -20px;
+  margin: 0 -10px;
+  transition: background 0.3s;
+}
+.stepper-step.done + .stepper-line {
+  background: var(--amethyst);
+}
+
+/* ── Choice Grid ── */
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.choice-card {
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out-expo);
+  border: 1px solid var(--glass-border);
+}
+.choice-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124, 58, 237, 0.3);
+  box-shadow: 0 8px 32px -8px rgba(124, 58, 237, 0.15);
+}
+.choice-card .card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+}
+.choice-card .card-icon svg { width: 24px; height: 24px; }
+.choice-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+.choice-card .card-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ── Step Content ── */
+.step-content {
+  display: none;
+}
+.step-content.active {
+  display: block;
+  animation: staggerIn 0.4s var(--ease-out-expo) both;
+}
+
+/* ── Settings Card (reuse glass) ── */
+.settings-card {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+.settings-card .card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+.settings-card .card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.settings-card .card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.settings-card .card-icon svg { width: 20px; height: 20px; }
+.settings-card .card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.settings-card .card-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── Form ── */
+.form-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+.form-field {
+  display: grid;
+  gap: 6px;
+}
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.form-input,
+.form-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  transition: all 0.2s;
+  min-height: 44px;
+  width: 100%;
+  outline: none;
+}
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select {
+  background: rgba(0, 0, 0, 0.03);
+}
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--amethyst);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  background: rgba(124, 58, 237, 0.04);
+}
+.form-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.form-input[type="password"] {
+  font-family: var(--font-mono);
+}
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237880a6' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+.form-select option {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Info Box ── */
+.setup-info {
+  background: var(--amethyst-muted);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.setup-info strong {
+  color: var(--amethyst-light);
+}
+
+/* ── Actions ── */
+.setup-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: var(--space-lg);
+}
+
+/* ── Test Result ── */
+.test-result {
+  margin-top: var(--space-md);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: none;
+}
+.test-result.success {
+  display: block;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--good);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.test-result.error {
+  display: block;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--crit);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ── Spin (loading icon) ── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin { animation: spin 1s linear infinite; }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .setup-title { font-size: 1.5rem; }
+  .choice-grid { grid-template-columns: 1fr; }
+  .setup-stepper { padding: 0; }
+  .stepper-circle { width: 40px; height: 40px; font-size: 0.95rem; }
+  .stepper-label { font-size: 0.75rem; }
+  .settings-card { padding: var(--space-md); }
+  .setup-actions { flex-direction: column; }
+  .setup-actions .btn { width: 100%; }
+}

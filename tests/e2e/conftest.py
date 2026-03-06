@@ -1,6 +1,7 @@
 """E2E test fixtures — live server via multiprocessing + waitress."""
 
 import multiprocessing
+import os
 import socket
 import time
 
@@ -185,4 +186,61 @@ def settings_page(page, live_server):
 @pytest.fixture()
 def auth_page(page, auth_server):
     """Provide a page pointed at the auth-protected server."""
+    return page
+
+
+# ── Unconfigured server (setup wizard) ──
+
+
+def _start_unconfigured_server(data_dir, port):
+    """Boot a DOCSight instance that is NOT configured — shows /setup."""
+    os.environ["DATA_DIR"] = data_dir
+    os.environ.pop("DEMO_MODE", None)
+    os.environ["LOG_LEVEL"] = "WARNING"
+
+    from app.config import ConfigManager
+    from app import web
+
+    cfg = ConfigManager(data_dir)
+    # Do NOT call cfg.save() — leave unconfigured so /setup renders
+
+    web.init_config(cfg)
+    web.init_storage(None)
+    web.init_collector(None)
+    web.init_collectors([])
+
+    from waitress import serve
+
+    serve(web.app, host="127.0.0.1", port=port, threads=2, _quiet=True)
+
+
+@pytest.fixture(scope="session")
+def _setup_data_dir(tmp_path_factory):
+    """Session-scoped temp directory for the unconfigured server."""
+    return str(tmp_path_factory.mktemp("docsight_e2e_setup"))
+
+
+@pytest.fixture(scope="session")
+def setup_server(_setup_data_dir):
+    """Start an unconfigured DOCSight server and return its base URL."""
+    port = _find_free_port()
+    proc = multiprocessing.Process(
+        target=_start_unconfigured_server,
+        args=(_setup_data_dir, port),
+        daemon=True,
+    )
+    proc.start()
+    try:
+        _wait_for_server(port)
+        yield f"http://127.0.0.1:{port}"
+    finally:
+        proc.terminate()
+        proc.join(timeout=5)
+
+
+@pytest.fixture()
+def setup_page(page, setup_server):
+    """Navigate to the unconfigured server — lands on /setup."""
+    page.goto(setup_server)
+    page.wait_for_load_state("networkidle")
     return page
