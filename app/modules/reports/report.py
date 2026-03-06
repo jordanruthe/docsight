@@ -24,11 +24,13 @@ def _format_threshold_table():
         v = ds[mod]
         g = v.get("good", [0, 0])
         w = v.get("warning", [0, 0])
+        c = v.get("critical", [0, 0])
         rows.append({
             "category": "DS Power",
             "variant": mod,
             "good": f"{g[0]} to {g[1]} dBmV",
-            "warn": f"{w[0]} to {w[1]} dBmV",
+            "tolerated": f"{w[0]} to {w[1]} dBmV",
+            "critical": f"{c[0]} to {c[1]} dBmV",
             "ref": "VFKD",
         })
     # US Power - per channel type
@@ -37,11 +39,13 @@ def _format_threshold_table():
         v = us[key]
         g = v.get("good", [0, 0])
         w = v.get("warning", [0, 0])
+        c = v.get("critical", [0, 0])
         rows.append({
             "category": "US Power",
             "variant": key,
             "good": f"{g[0]} to {g[1]} dBmV",
-            "warn": f"{w[0]} to {w[1]} dBmV",
+            "tolerated": f"{w[0]} to {w[1]} dBmV",
+            "critical": f"{c[0]} to {c[1]} dBmV",
             "ref": "VFKD",
         })
     # SNR - per modulation
@@ -52,7 +56,8 @@ def _format_threshold_table():
             "category": "SNR/MER",
             "variant": mod,
             "good": f">= {v.get('good_min', 0)} dB",
-            "warn": f">= {v.get('warning_min', 0)} dB",
+            "tolerated": f">= {v.get('warning_min', 0)} dB",
+            "critical": f">= {v.get('critical_min', 0)} dB",
             "ref": "VFKD",
         })
     # US Modulation - QAM order health
@@ -64,7 +69,8 @@ def _format_threshold_table():
             "category": "US Modulation",
             "variant": "QAM Order",
             "good": f"> {warn_qam}-QAM",
-            "warn": f"<= {warn_qam}-QAM / <= {crit_qam}-QAM crit.",
+            "tolerated": f"<= {warn_qam}-QAM",
+            "critical": f"<= {crit_qam}-QAM",
             "ref": "VFKD",
         })
     return rows
@@ -74,12 +80,14 @@ def _default_warn_thresholds():
     """Get default warning thresholds as display strings for report."""
     t = get_thresholds()
     ds = t.get("downstream_power", {}).get("256QAM", {})
-    us = t.get("upstream_power", {}).get("EuroDOCSIS 3.0", {})
+    us = t.get("upstream_power", {}).get("sc_qam", {})
     snr = t.get("snr", {}).get("256QAM", {})
+    ds_w = ds.get("warning", [-5.9, 18.0])
+    us_w = us.get("warning", [37.1, 51.0])
     return {
-        "ds_power": f"{ds.get('tolerated_min', -5.9)} to {ds.get('tolerated_max', 18.0)} dBmV",
-        "us_power": f"{us.get('tolerated_min', 37.1)} to {us.get('tolerated_max', 51.0)} dBmV",
-        "snr": f">= {snr.get('tolerated_min', 32.0)} dB",
+        "ds_power": f"{ds_w[0]} to {ds_w[1]} dBmV",
+        "us_power": f"{us_w[0]} to {us_w[1]} dBmV",
+        "snr": f">= {snr.get('warning_min', 31.0)} dB",
     }
 
 # ---------------------------------------------------------------------------
@@ -121,7 +129,8 @@ REPORT_STRINGS = {
         "col_parameter": "Parameter",
         "col_modulation": "Modulation",
         "col_good": "Good",
-        "col_warning": "Warning",
+        "col_tolerated": "Tolerated",
+        "col_critical_thresh": "Critical",
         "col_reference": "Reference",
         # Stats
         "total_measurements": "Total Measurements",
@@ -238,7 +247,8 @@ REPORT_STRINGS = {
         "col_parameter": "Parameter",
         "col_modulation": "Modulation",
         "col_good": "Gut",
-        "col_warning": "Warnung",
+        "col_tolerated": "Toleriert",
+        "col_critical_thresh": "Kritisch",
         "col_reference": "Referenz",
         "total_measurements": "Messungen gesamt",
         "measurements_critical": "Zustand KRITISCH",
@@ -354,7 +364,8 @@ REPORT_STRINGS = {
         "col_parameter": "Paramètre",
         "col_modulation": "Modulation",
         "col_good": "Bon",
-        "col_warning": "Alerte",
+        "col_tolerated": "Toléré",
+        "col_critical_thresh": "Critique",
         "col_reference": "Référence",
         "total_measurements": "Mesures totales",
         "measurements_critical": "État CRITIQUE",
@@ -471,7 +482,8 @@ REPORT_STRINGS = {
         "col_parameter": "Parámetro",
         "col_modulation": "Modulación",
         "col_good": "Bueno",
-        "col_warning": "Alerta",
+        "col_tolerated": "Tolerado",
+        "col_critical_thresh": "Crítico",
         "col_reference": "Referencia",
         "total_measurements": "Mediciones totales",
         "measurements_critical": "Estado CRÍTICO",
@@ -677,11 +689,11 @@ def _find_worst_channels(snapshots):
     for snap in snapshots:
         for ch in snap.get("ds_channels", []):
             cid = ch.get("channel_id", 0)
-            if ch.get("health") != "good":
+            if ch.get("health") not in ("good", "tolerated"):
                 ds_issues[cid] = ds_issues.get(cid, 0) + 1
         for ch in snap.get("us_channels", []):
             cid = ch.get("channel_id", 0)
-            if ch.get("health") != "good":
+            if ch.get("health") not in ("good", "tolerated"):
                 us_issues[cid] = us_issues.get(cid, 0) + 1
     ds_sorted = sorted(ds_issues.items(), key=lambda x: x[1], reverse=True)[:5]
     us_sorted = sorted(us_issues.items(), key=lambda x: x[1], reverse=True)[:5]
@@ -783,6 +795,7 @@ def generate_report(snapshots, current_analysis, config=None, connection_info=No
         pdf._key_value(s["total_measurements"], str(worst["total_snapshots"]))
         pdf._key_value(s["measurements_critical"], str(worst["health_critical_count"]), bold_value=True)
         pdf._key_value(s["measurements_marginal"], str(worst["health_marginal_count"]))
+        pdf._key_value(s["measurements_tolerated"], str(worst["health_tolerated_count"]))
         pdf.ln(2)
 
         pdf.set_font("dejavu", "B", 10)
@@ -819,11 +832,11 @@ def generate_report(snapshots, current_analysis, config=None, connection_info=No
     pdf.add_page()
     pdf._section_title(s["section_thresholds"])
     pdf.set_font("dejavu", "", 9)
-    cols_ref = [s["col_parameter"], s["col_modulation"], s["col_good"], s["col_warning"], s["col_reference"]]
-    widths_ref = [30, 35, 40, 40, 25]
+    cols_ref = [s["col_parameter"], s["col_modulation"], s["col_good"], s["col_tolerated"], s["col_critical_thresh"], s["col_reference"]]
+    widths_ref = [28, 28, 35, 35, 35, 25]
     pdf._table_header(cols_ref, widths_ref)
     for row in _format_threshold_table():
-        pdf._table_row([row["category"], row["variant"], row["good"], row["warn"], row["ref"]], widths_ref)
+        pdf._table_row([row["category"], row["variant"], row["good"], row["tolerated"], row["critical"], row["ref"]], widths_ref)
     pdf.ln(5)
 
     # --- ISP Complaint Template ---
@@ -952,6 +965,7 @@ def generate_incident_report(incident, entries, snapshots, speedtests, bnetz_lis
         pdf._key_value(s["total_measurements"], str(worst["total_snapshots"]))
         pdf._key_value(s["measurements_critical"], str(worst["health_critical_count"]), bold_value=True)
         pdf._key_value(s["measurements_marginal"], str(worst["health_marginal_count"]))
+        pdf._key_value(s["measurements_tolerated"], str(worst["health_tolerated_count"]))
         pdf.ln(2)
 
         pdf.set_font("dejavu", "B", 10)
