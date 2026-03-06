@@ -5,9 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for requesting support for a new modem! To add modem support, we need technical details about how to access the modem's DOCSIS status page.
-        
-        Please read the [Adding Modem Support](https://github.com/itsDNNS/docsight/wiki/Adding-Modem-Support) guide first.
+        Thanks for requesting support for a new modem! Before filling out this form, please follow the [Requesting Modem Support](https://github.com/itsDNNS/docsight/wiki/Requesting-Modem-Support) guide to collect the data we need (HAR file, screenshot, firmware version).
 
   - type: input
     id: manufacturer
@@ -33,6 +31,8 @@ body:
       label: Firmware Version
       description: Current firmware version (usually shown in the web interface)
       placeholder: e.g., 01.05.063.13.EURO.PC20
+    validations:
+      required: true
 
   - type: input
     id: isp
@@ -82,23 +82,26 @@ body:
         Upload a screenshot of the DOCSIS status page showing downstream/upstream channels.
         Redact any sensitive information (MAC address, IP, serial number).
       placeholder: Drag and drop a screenshot here
+    validations:
+      required: true
 
   - type: textarea
     id: har_file
     attributes:
-      label: HAR File (Optional but Helpful)
+      label: HAR File (Network Capture)
       description: |
-        A HAR file shows exactly how the web interface works. 
-        
+        We need a HAR file to understand how your modem's web interface fetches data. Without this, we can't build a driver -- every modem and ISP firmware variant uses different API endpoints and authentication flows.
+
         **How to capture:**
-        1. Open Chrome/Firefox Developer Tools (F12)
-        2. Go to Network tab
-        3. Navigate to DOCSIS status page in the modem
-        4. Right-click in Network tab → Save as HAR
-        5. Upload the .har file here (redact sensitive data)
-        
-        This helps us understand authentication and API endpoints.
-      placeholder: Drag and drop .har file or paste the content
+        1. Open your modem's web interface in Chrome or Firefox
+        2. Open Developer Tools (F12) -> Network tab
+        3. Log in and navigate to the DOCSIS status page (the page showing downstream/upstream channels)
+        4. Right-click in the Network tab -> "Save all as HAR"
+        5. **Important:** Open the HAR file in a text editor and remove any passwords, MAC addresses, or serial numbers before uploading
+        6. Upload the .har file here
+      placeholder: Drag and drop .har file here
+    validations:
+      required: true
 
   - type: checkboxes
     id: contribution
