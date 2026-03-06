@@ -219,8 +219,8 @@ def api_export():
 
     lines += [
         "### Downstream Power (dBmV)",
-        "| Modulation | Good | Warning | Critical |",
-        "|------------|------|---------|----------|",
+        "| Modulation | Good | Tolerated | Critical |",
+        "|------------|------|-----------|----------|",
     ]
     _ds = _thresh.get("downstream_power", {})
     for mod in sorted(k for k in _ds if not k.startswith("_")):
@@ -233,8 +233,8 @@ def api_export():
     lines += [
         "",
         "### Upstream Power (dBmV)",
-        "| Channel Type | Good | Warning | Critical |",
-        "|-------------|------|---------|----------|",
+        "| Channel Type | Good | Tolerated | Critical |",
+        "|-------------|------|-----------|----------|",
     ]
     _us = _thresh.get("upstream_power", {})
     for key in sorted(k for k in _us if not k.startswith("_")):
@@ -247,8 +247,8 @@ def api_export():
     lines += [
         "",
         "### SNR / MER (dB, absolute)",
-        "| Modulation | Good | Warning | Critical |",
-        "|------------|------|---------|----------|",
+        "| Modulation | Good | Tolerated | Critical |",
+        "|------------|------|-----------|----------|",
     ]
     _snr = _thresh.get("snr", {})
     for mod in sorted(k for k in _snr if not k.startswith("_")):
@@ -263,7 +263,7 @@ def api_export():
     _err = _thresh.get("errors", {}).get("uncorrectable_pct")
     if _err:
         lines.append("")
-        lines.append(f"**Uncorrectable Errors**: Warning >= {_err.get('warning', 1.0)}%, Critical >= {_err.get('critical', 3.0)}%")
+        lines.append(f"**Uncorrectable Errors**: Tolerated >= {_err.get('warning', 1.0)}%, Critical >= {_err.get('critical', 3.0)}%")
 
     lines.append("")
 
