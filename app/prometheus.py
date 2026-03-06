@@ -6,7 +6,7 @@ Pure function — no Flask dependency, no side effects.
 from .analyzer import _parse_qam_order
 
 # Health string to numeric mapping
-_HEALTH_MAP = {"good": 0, "marginal": 1, "poor": 2}
+_HEALTH_MAP = {"good": 0, "tolerated": 1, "marginal": 2, "critical": 3}
 
 
 def _metric(lines, help_text, metric_type, name, value, labels=None):
@@ -52,13 +52,13 @@ def format_metrics(analysis, device_info, connection_info, last_poll_timestamp):
     # --- Health status ---
     if analysis is not None:
         health_str = analysis.get("summary", {}).get("health", "good")
-        health_val = _HEALTH_MAP.get(health_str, 3)
+        health_val = _HEALTH_MAP.get(health_str, 4)
     else:
-        health_val = 3
+        health_val = 4
 
     _metric(
         lines,
-        "DOCSIS signal health status: 0=good 1=marginal 2=poor 3=unknown",
+        "DOCSIS signal health status: 0=good 1=tolerated 2=marginal 3=critical 4=unknown",
         "gauge",
         "docsight_health_status",
         health_val,

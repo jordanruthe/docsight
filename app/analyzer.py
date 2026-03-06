@@ -69,10 +69,13 @@ def _get_ds_power_thresholds(modulation=None):
     mod = _resolve_modulation(modulation, ds)
     t = ds.get(mod, {})
     good = t.get("good", [-4.0, 13.0])
+    warn = t.get("warning", good)
     crit = t.get("critical", [-8.0, 20.0])
     return {
         "good_min": good[0],
         "good_max": good[1],
+        "warn_min": warn[0],
+        "warn_max": warn[1],
         "crit_min": crit[0],
         "crit_max": crit[1],
     }
@@ -88,10 +91,13 @@ def _get_us_power_thresholds(channel_type=None):
         key = "sc_qam"
     t = us.get(key, us.get(default_key, {}))
     good = t.get("good", [41.0, 47.0])
+    warn = t.get("warning", good)
     crit = t.get("critical", [35.0, 53.0])
     return {
         "good_min": good[0],
         "good_max": good[1],
+        "warn_min": warn[0],
+        "warn_max": warn[1],
         "crit_min": crit[0],
         "crit_max": crit[1],
     }
@@ -104,6 +110,7 @@ def _get_snr_thresholds(modulation=None):
     t = snr.get(mod, {})
     return {
         "good_min": t.get("good_min", 33.0),
+        "warn_min": t.get("warning_min", t.get("good_min", 33.0)),
         "crit_min": t.get("critical_min", 29.0),
     }
 
@@ -172,9 +179,11 @@ def apply_spike_suppression(analysis, last_spike_ts):
     if not issues:
         summary["health"] = "good"
     elif any("critical" in i for i in issues):
-        summary["health"] = "poor"
-    else:
+        summary["health"] = "critical"
+    elif any("marginal" in i for i in issues):
         summary["health"] = "marginal"
+    else:
+        summary["health"] = "tolerated"
 
 
 def _parse_qam_order(modulation_str):
@@ -242,7 +251,9 @@ def _channel_health(issues):
         return "good"
     if any("critical" in i for i in issues):
         return "critical"
-    return "warning"
+    if any("warning" in i for i in issues):
+        return "warning"
+    return "tolerated"
 
 
 def _health_detail(issues):
@@ -263,8 +274,10 @@ def _assess_ds_channel(ch, docsis_ver):
         pt = _get_ds_power_thresholds(modulation)
         if power < pt["crit_min"] or power > pt["crit_max"]:
             issues.append("power critical")
-        elif power < pt["good_min"] or power > pt["good_max"]:
+        elif power < pt["warn_min"] or power > pt["warn_max"]:
             issues.append("power warning")
+        elif power < pt["good_min"] or power > pt["good_max"]:
+            issues.append("power tolerated")
 
     snr_val = None
     if docsis_ver == "3.0" and ch.get("mse"):
@@ -276,8 +289,10 @@ def _assess_ds_channel(ch, docsis_ver):
         st = _get_snr_thresholds(modulation)
         if snr_val < st["crit_min"]:
             issues.append("snr critical")
-        elif snr_val < st["good_min"]:
+        elif snr_val < st["warn_min"]:
             issues.append("snr warning")
+        elif snr_val < st["good_min"]:
+            issues.append("snr tolerated")
 
     return _channel_health(issues), _health_detail(issues)
 
@@ -297,10 +312,14 @@ def _assess_us_channel(ch, docsis_ver="3.0"):
             issues.append("power critical low")
         elif power > pt["crit_max"]:
             issues.append("power critical high")
-        elif power < pt["good_min"]:
+        elif power < pt["warn_min"]:
             issues.append("power warning low")
-        elif power > pt["good_max"]:
+        elif power > pt["warn_max"]:
             issues.append("power warning high")
+        elif power < pt["good_min"]:
+            issues.append("power tolerated low")
+        elif power > pt["good_max"]:
+            issues.append("power tolerated high")
     qam_order = _parse_qam_order(modulation)
     if qam_order is not None:
         mt = _get_us_modulation_thresholds()
@@ -450,33 +469,43 @@ def analyze(data: dict) -> dict:
     if any("power critical" in c["health_detail"] for c in ds_channels):
         issues.append("ds_power_critical")
     elif any("power warning" in c["health_detail"] for c in ds_channels):
-        issues.append("ds_power_warn")
+        issues.append("ds_power_marginal")
+    elif any("power tolerated" in c["health_detail"] for c in ds_channels):
+        issues.append("ds_power_tolerated")
 
     # US power: aggregate from individual channel health_detail (directional)
     us_crit_low = any("power critical low" in c["health_detail"] for c in us_channels)
     us_crit_high = any("power critical high" in c["health_detail"] for c in us_channels)
     us_warn_low = any("power warning low" in c["health_detail"] for c in us_channels)
     us_warn_high = any("power warning high" in c["health_detail"] for c in us_channels)
+    us_tol_low = any("power tolerated low" in c["health_detail"] for c in us_channels)
+    us_tol_high = any("power tolerated high" in c["health_detail"] for c in us_channels)
     if us_crit_low:
         issues.append("us_power_critical_low")
     if us_crit_high:
         issues.append("us_power_critical_high")
     if us_warn_low and not us_crit_low:
-        issues.append("us_power_warn_low")
+        issues.append("us_power_marginal_low")
     if us_warn_high and not us_crit_high:
-        issues.append("us_power_warn_high")
+        issues.append("us_power_marginal_high")
+    if us_tol_low and not us_crit_low and not us_warn_low:
+        issues.append("us_power_tolerated_low")
+    if us_tol_high and not us_crit_high and not us_warn_high:
+        issues.append("us_power_tolerated_high")
 
     # US modulation: aggregate from individual channel health_detail
     if any("modulation critical" in c["health_detail"] for c in us_channels):
         issues.append("us_modulation_critical")
     elif any("modulation warning" in c["health_detail"] for c in us_channels):
-        issues.append("us_modulation_warn")
+        issues.append("us_modulation_marginal")
 
     # SNR: aggregate from individual channel health_detail
     if any("snr critical" in c["health_detail"] for c in ds_channels):
         issues.append("snr_critical")
     elif any("snr warning" in c["health_detail"] for c in ds_channels):
-        issues.append("snr_warn")
+        issues.append("snr_marginal")
+    elif any("snr tolerated" in c["health_detail"] for c in ds_channels):
+        issues.append("snr_tolerated")
 
     total_codewords = total_corr + total_uncorr
     et = _get_uncorr_thresholds()
@@ -493,9 +522,11 @@ def analyze(data: dict) -> dict:
     if not issues:
         summary["health"] = "good"
     elif any("critical" in i for i in issues):
-        summary["health"] = "poor"
-    else:
+        summary["health"] = "critical"
+    elif any("marginal" in i for i in issues):
         summary["health"] = "marginal"
+    else:
+        summary["health"] = "tolerated"
     summary["health_issues"] = issues
 
     log.info(

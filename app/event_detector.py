@@ -108,13 +108,13 @@ class EventDetector:
             return
 
         # Determine severity based on transition direction
-        health_order = {"good": 0, "marginal": 1, "poor": 2}
+        health_order = {"good": 0, "tolerated": 1, "marginal": 2, "critical": 3}
         cur_level = health_order.get(cur_health, 0)
         prev_level = health_order.get(prev_health, 0)
 
         if cur_level > prev_level:
             # Degradation
-            severity = "critical" if cur_health == "poor" else "warning"
+            severity = "critical" if cur_health == "critical" else "warning"
             message = f"Health changed from {prev_health} to {cur_health}"
         else:
             # Recovery

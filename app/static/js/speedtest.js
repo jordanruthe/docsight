@@ -209,10 +209,8 @@ function toggleSpeedtestSignal(btn) {
                 container.innerHTML = '<span class="st-sig-no-data">' + escapeHtml(data.message || T.signal_no_snapshot) + '</span>';
                 return;
             }
-            var healthClass = 'health-' + (data.health === 'good' ? 'good' : data.health === 'marginal' ? 'marginal' : 'poor');
-            var healthLabel = data.health === 'good' ? (T.health_good || 'Good')
-                : data.health === 'marginal' ? (T.health_marginal || 'Marginal')
-                : (T.health_poor || 'Poor');
+            var healthClass = 'health-' + (data.health || 'unknown');
+            var healthLabel = {good: T.health_good || 'Good', tolerated: T.health_tolerated || 'Tolerated', marginal: T.health_marginal || 'Marginal', critical: T.health_critical || 'Critical'}[data.health] || data.health;
             var html = '<div class="st-sig-item"><span class="st-sig-label">' + (T.signal_health || 'Health') + '</span>'
                 + '<span class="st-health-badge ' + healthClass + '">' + escapeHtml(healthLabel) + '</span></div>'
                 + '<div class="st-sig-item"><span class="st-sig-label">' + (T.signal_ds_power || 'DS Power') + '</span>'

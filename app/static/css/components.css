@@ -81,6 +81,7 @@ body {
   white-space: nowrap;
 }
 .badge-good { background: var(--good-muted); color: var(--good); }
+.badge-tolerated { background: var(--tolerated-muted); color: var(--tolerated); }
 .badge-warn { background: var(--warn-muted); color: var(--warn); }
 .badge-crit { background: var(--crit-muted); color: var(--crit); }
 .badge-info { background: var(--info-muted); color: var(--info); }
@@ -99,6 +100,11 @@ body {
   background: var(--good);
   box-shadow: 0 0 8px var(--good);
   animation: pulse 2s infinite;
+}
+.status-dot.tolerated {
+  background: var(--tolerated);
+  box-shadow: 0 0 8px var(--tolerated);
+  animation: pulse 1.8s infinite;
 }
 .status-dot.warn {
   background: var(--warn);

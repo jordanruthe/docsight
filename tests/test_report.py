@@ -37,7 +37,7 @@ MOCK_SNAPSHOTS = [
     {"timestamp": "2026-02-04T10:00:00", "summary": MOCK_ANALYSIS["summary"],
      "ds_channels": MOCK_ANALYSIS["ds_channels"], "us_channels": MOCK_ANALYSIS["us_channels"]},
     {"timestamp": "2026-02-05T10:00:00", "summary": {
-        **MOCK_ANALYSIS["summary"], "health": "poor", "ds_snr_min": 22.0,
+        **MOCK_ANALYSIS["summary"], "health": "critical", "ds_snr_min": 22.0,
         "us_power_max": 55.0, "ds_uncorrectable_errors": 50000,
         "health_issues": ["snr_critical", "us_power_critical_high"]},
      "ds_channels": MOCK_ANALYSIS["ds_channels"], "us_channels": MOCK_ANALYSIS["us_channels"]},
@@ -66,7 +66,7 @@ def test_generate_report_with_config():
 
 def test_compute_worst_values():
     worst = _compute_worst_values(MOCK_SNAPSHOTS)
-    assert worst["health_poor_count"] == 1
+    assert worst["health_critical_count"] == 1
     assert worst["total_snapshots"] == 2
     assert worst["us_power_max"] == 55.0
     assert worst["ds_snr_min"] == 22.0
@@ -95,8 +95,8 @@ def test_format_threshold_table_uses_real_values():
     # Upstream modulation thresholds
     us_mod = [r for r in rows if r["category"] == "US Modulation"]
     assert len(us_mod) == 1
-    assert "16" in us_mod[0]["warn"]
-    assert "4" in us_mod[0]["warn"]
+    assert "16" in us_mod[0]["tolerated"]
+    assert "4" in us_mod[0]["critical"]
 
 
 def test_default_warn_thresholds():
@@ -110,8 +110,8 @@ def test_default_warn_thresholds():
     # EuroDOCSIS 3.0 tolerated: 37.1 to 51.0
     assert "37.1" in warn["us_power"]
     assert "51.0" in warn["us_power"]
-    # SNR 256QAM tolerated_min: 32.0
-    assert "32.0" in warn["snr"]
+    # SNR 256QAM warning_min: 31.0
+    assert "31.0" in warn["snr"]
 
 
 def test_generate_report_with_none_channel_values():
@@ -142,4 +142,4 @@ def test_complaint_text_uses_real_thresholds():
     # Should contain real threshold values from thresholds.json
     assert "-5.9 to 18.0 dBmV" in text
     assert "37.1 to 51.0 dBmV" in text
-    assert ">= 32.0 dB" in text
+    assert ">= 31.0 dB" in text

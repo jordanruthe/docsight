@@ -294,14 +294,21 @@ class MQTTPublisher:
         # Health details (human-readable summary of issues)
         _ISSUE_LABELS = {
             "ds_power_critical": "DS power critical",
-            "ds_power_warn": "DS power warning",
+            "ds_power_marginal": "DS power marginal",
+            "ds_power_tolerated": "DS power tolerated deviation",
             "us_power_critical_low": "US power critically low",
             "us_power_critical_high": "US power critically high",
-            "us_power_warn_low": "US power below ideal",
-            "us_power_warn_high": "US power elevated",
+            "us_power_marginal_low": "US power below ideal",
+            "us_power_marginal_high": "US power elevated",
+            "us_power_tolerated_low": "US power slightly low",
+            "us_power_tolerated_high": "US power slightly high",
             "snr_critical": "SNR critical",
-            "snr_warn": "SNR warning",
+            "snr_marginal": "SNR marginal",
+            "snr_tolerated": "SNR tolerated deviation",
+            "us_modulation_critical": "US modulation critically degraded",
+            "us_modulation_marginal": "US modulation degraded",
             "uncorr_errors_high": "High uncorrectable errors",
+            "uncorr_errors_critical": "Uncorrectable error rate critical",
         }
         details = ", ".join(_ISSUE_LABELS.get(i, i) for i in health_issues)
         self.client.publish(

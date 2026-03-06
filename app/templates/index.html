@@ -247,38 +247,50 @@
     {% endif %}
 
     {% if has_docsis %}
-    {% set health_map = {"good": t.health_good, "marginal": t.health_marginal, "poor": t.health_poor} %}
+    {% set health_map = {"good": t.health_good, "tolerated": t.health_tolerated, "marginal": t.health_marginal, "critical": t.health_critical} %}
     {% set health_label = health_map.get(s.health, s.health) %}
-    {% set health_msgs = {"good": t.health_good_msg, "marginal": t.health_marginal_msg, "poor": t.health_poor_msg} %}
+    {% set health_msgs = {"good": t.health_good_msg, "tolerated": t.health_tolerated_msg, "marginal": t.health_marginal_msg, "critical": t.health_critical_msg} %}
     {% set issue_labels = {
         "ds_power_critical": t.issue_ds_power_critical,
+        "ds_power_marginal": t.issue_ds_power_marginal,
+        "ds_power_tolerated": t.issue_ds_power_tolerated,
         "us_power_critical_low": t.issue_us_power_critical_low,
         "us_power_critical_high": t.issue_us_power_critical_high,
-        "us_power_warn_low": t.issue_us_power_warn_low,
-        "us_power_warn_high": t.issue_us_power_warn_high,
-        "us_modulation_warn": t.issue_us_modulation_warn,
+        "us_power_marginal_low": t.issue_us_power_marginal_low,
+        "us_power_marginal_high": t.issue_us_power_marginal_high,
+        "us_power_tolerated_low": t.issue_us_power_tolerated_low,
+        "us_power_tolerated_high": t.issue_us_power_tolerated_high,
+        "us_modulation_marginal": t.issue_us_modulation_marginal,
         "us_modulation_critical": t.issue_us_modulation_critical,
         "snr_critical": t.issue_snr_critical,
-        "snr_warn": t.issue_snr_warn,
+        "snr_marginal": t.issue_snr_marginal,
+        "snr_tolerated": t.issue_snr_tolerated,
         "uncorr_errors_high": t.issue_uncorr_errors_high,
+        "uncorr_errors_critical": t.issue_uncorr_errors_critical,
     } %}
     {% set issue_descs = {
         "ds_power_critical": t.issue_ds_power_critical_desc,
+        "ds_power_marginal": t.issue_ds_power_marginal_desc,
+        "ds_power_tolerated": t.issue_ds_power_tolerated_desc,
         "us_power_critical_low": t.issue_us_power_critical_low_desc,
         "us_power_critical_high": t.issue_us_power_critical_high_desc,
-        "us_power_warn_low": t.issue_us_power_warn_low_desc,
-        "us_power_warn_high": t.issue_us_power_warn_high_desc,
-        "us_modulation_warn": t.issue_us_modulation_warn_desc,
+        "us_power_marginal_low": t.issue_us_power_marginal_low_desc,
+        "us_power_marginal_high": t.issue_us_power_marginal_high_desc,
+        "us_power_tolerated_low": t.issue_us_power_tolerated_low_desc,
+        "us_power_tolerated_high": t.issue_us_power_tolerated_high_desc,
+        "us_modulation_marginal": t.issue_us_modulation_marginal_desc,
         "us_modulation_critical": t.issue_us_modulation_critical_desc,
         "snr_critical": t.issue_snr_critical_desc,
-        "snr_warn": t.issue_snr_warn_desc,
+        "snr_marginal": t.issue_snr_marginal_desc,
+        "snr_tolerated": t.issue_snr_tolerated_desc,
         "uncorr_errors_high": t.issue_uncorr_errors_high_desc,
+        "uncorr_errors_critical": t.issue_uncorr_errors_critical_desc,
     } %}
 
     {# ══════════════════════════════════════════════════════════════════════════
        HERO CARD — Health status + meta info + trend chart
        ══════════════════════════════════════════════════════════════════════════ #}
-    {% set hero_health = 'good' if s.health == 'good' else ('crit' if s.health == 'poor' else 'warn') %}
+    {% set hero_health = 'good' if s.health == 'good' else ('tolerated' if s.health == 'tolerated' else ('crit' if s.health == 'critical' else 'warn')) %}
     <div class="hero-card glass">
         <div class="hero-header">
             <div class="hero-status">
@@ -336,7 +348,7 @@
         </div>
         {% for issue in s.health_issues %}
         <div class="issue-item">
-            <div class="issue-icon {{ 'crit' if 'critical' in issue else 'warn' }}"><i data-lucide="alert-circle"></i></div>
+            <div class="issue-icon {{ 'crit' if 'critical' in issue else ('tolerated' if 'tolerated' in issue else 'warn') }}"><i data-lucide="alert-circle"></i></div>
             <div>
                 <div class="issue-text">{{ issue_labels.get(issue, issue) }}</div>
                 <div class="issue-desc">{{ issue_descs.get(issue, '') }}</div>
@@ -348,18 +360,20 @@
 
     {# ── Per-card health ── #}
     {% set signal_health = 'crit' if 'ds_power_critical' in s.health_issues or 'snr_critical' in s.health_issues
-       else ('warn' if 'ds_power_warn' in s.health_issues or 'snr_warn' in s.health_issues else 'good') %}
+       else ('warn' if 'ds_power_marginal' in s.health_issues or 'snr_marginal' in s.health_issues
+       else ('tolerated' if 'ds_power_tolerated' in s.health_issues or 'snr_tolerated' in s.health_issues else 'good')) %}
     {% set us_health = 'crit' if 'us_power_critical_low' in s.health_issues or 'us_power_critical_high' in s.health_issues
-       else ('warn' if 'us_power_warn_low' in s.health_issues or 'us_power_warn_high' in s.health_issues else 'good') %}
+       else ('warn' if 'us_power_marginal_low' in s.health_issues or 'us_power_marginal_high' in s.health_issues
+       else ('tolerated' if 'us_power_tolerated_low' in s.health_issues or 'us_power_tolerated_high' in s.health_issues else 'good')) %}
     {% set error_health = 'crit' if 'uncorr_errors_critical' in s.health_issues else ('warn' if 'uncorr_errors_high' in s.health_issues else 'good') %}
 
     {# ── DS Power health ── #}
-    {% set ds_pwr_health = 'crit' if 'ds_power_critical' in s.health_issues else ('warn' if 'ds_power_warn' in s.health_issues else 'good') %}
+    {% set ds_pwr_health = 'crit' if 'ds_power_critical' in s.health_issues else ('warn' if 'ds_power_marginal' in s.health_issues else ('tolerated' if 'ds_power_tolerated' in s.health_issues else 'good')) %}
     {# ── SNR health ── #}
-    {% set snr_health = 'crit' if 'snr_critical' in s.health_issues else ('warn' if 'snr_warn' in s.health_issues else 'good') %}
+    {% set snr_health = 'crit' if 'snr_critical' in s.health_issues else ('warn' if 'snr_marginal' in s.health_issues else ('tolerated' if 'snr_tolerated' in s.health_issues else 'good')) %}
 
     {# ── Health label mapping ── #}
-    {% set health_labels = {'good': t.health_good, 'warn': t.health_marginal, 'crit': t.health_poor} %}
+    {% set health_labels = {'good': t.health_good, 'tolerated': t.health_tolerated, 'warn': t.health_marginal, 'crit': t.health_critical} %}
 
     {# ══════════════════════════════════════════════════════════════════════════
        METRICS GRID — Compact signal + error + speed cards
@@ -463,19 +477,21 @@
        CHANNEL HEALTH OVERVIEW — Ring gauges for DS/US health distribution
        ══════════════════════════════════════════════════════════════════════════ #}
     {% set ds_good = ds|selectattr('health', 'equalto', 'good')|list|length %}
-    {% set ds_warn = ds|rejectattr('health', 'equalto', 'good')|rejectattr('health', 'equalto', 'critical')|list|length %}
+    {% set ds_tolerated = ds|selectattr('health', 'equalto', 'tolerated')|list|length %}
+    {% set ds_warn = ds|selectattr('health', 'equalto', 'warning')|list|length %}
     {% set ds_crit = ds|selectattr('health', 'equalto', 'critical')|list|length %}
     {% set ds_total = ds|length %}
-    {% set ds_pct = ((ds_good / ds_total * 100)|round(0)|int) if ds_total > 0 else 0 %}
+    {% set ds_pct = (((ds_good + ds_tolerated) / ds_total * 100)|round(0)|int) if ds_total > 0 else 0 %}
     {% set us_good_c = us|selectattr('health', 'equalto', 'good')|list|length %}
-    {% set us_warn_c = us|rejectattr('health', 'equalto', 'good')|rejectattr('health', 'equalto', 'critical')|list|length %}
+    {% set us_tolerated_c = us|selectattr('health', 'equalto', 'tolerated')|list|length %}
+    {% set us_warn_c = us|selectattr('health', 'equalto', 'warning')|list|length %}
     {% set us_crit_c = us|selectattr('health', 'equalto', 'critical')|list|length %}
     {% set us_total = us|length %}
-    {% set us_pct = ((us_good_c / us_total * 100)|round(0)|int) if us_total > 0 else 0 %}
+    {% set us_pct = (((us_good_c + us_tolerated_c) / us_total * 100)|round(0)|int) if us_total > 0 else 0 %}
     <div class="health-overview">
         <div class="health-ring-card glass">
             <div class="ring-wrap"
-                 data-good="{{ ds_good }}" data-warn="{{ ds_warn }}" data-crit="{{ ds_crit }}"
+                 data-good="{{ ds_good }}" data-tolerated="{{ ds_tolerated }}" data-warn="{{ ds_warn }}" data-crit="{{ ds_crit }}"
                  ontouchstart="this.classList.add('touched')" ontouchend="setTimeout(()=>this.classList.remove('touched'),2000)">
                 <canvas id="ds-health-donut" width="100" height="100"></canvas>
                 <div class="ring-center">
@@ -488,6 +504,7 @@
                 <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:var(--space-xs);">{{ ds_total }} {{ t.channels }}</div>
                 <div class="ring-legend">
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--good);"></span> {{ health_labels.good }} <span class="ring-legend-count" style="color:{{ 'var(--good)' if ds_good > 0 else 'var(--text-muted)' }};">{{ ds_good }}</span></div>
+                    <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--tolerated);"></span> {{ health_labels.tolerated }} <span class="ring-legend-count" style="color:{{ 'var(--tolerated)' if ds_tolerated > 0 else 'var(--text-muted)' }};">{{ ds_tolerated }}</span></div>
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--warn);"></span> {{ health_labels.warn }} <span class="ring-legend-count" style="color:{{ 'var(--warn)' if ds_warn > 0 else 'var(--text-muted)' }};">{{ ds_warn }}</span></div>
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--crit);"></span> {{ health_labels.crit }} <span class="ring-legend-count" style="color:{{ 'var(--crit)' if ds_crit > 0 else 'var(--text-muted)' }};">{{ ds_crit }}</span></div>
                 </div>
@@ -495,7 +512,7 @@
         </div>
         <div class="health-ring-card glass">
             <div class="ring-wrap"
-                 data-good="{{ us_good_c }}" data-warn="{{ us_warn_c }}" data-crit="{{ us_crit_c }}"
+                 data-good="{{ us_good_c }}" data-tolerated="{{ us_tolerated_c }}" data-warn="{{ us_warn_c }}" data-crit="{{ us_crit_c }}"
                  ontouchstart="this.classList.add('touched')" ontouchend="setTimeout(()=>this.classList.remove('touched'),2000)">
                 <canvas id="us-health-donut" width="100" height="100"></canvas>
                 <div class="ring-center">
@@ -508,6 +525,7 @@
                 <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:var(--space-xs);">{{ us_total }} {{ t.channels }}</div>
                 <div class="ring-legend">
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--good);"></span> {{ health_labels.good }} <span class="ring-legend-count" style="color:{{ 'var(--good)' if us_good_c > 0 else 'var(--text-muted)' }};">{{ us_good_c }}</span></div>
+                    <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--tolerated);"></span> {{ health_labels.tolerated }} <span class="ring-legend-count" style="color:{{ 'var(--tolerated)' if us_tolerated_c > 0 else 'var(--text-muted)' }};">{{ us_tolerated_c }}</span></div>
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--warn);"></span> {{ health_labels.warn }} <span class="ring-legend-count" style="color:{{ 'var(--warn)' if us_warn_c > 0 else 'var(--text-muted)' }};">{{ us_warn_c }}</span></div>
                     <div class="ring-legend-item"><span class="ring-legend-dot" style="background:var(--crit);"></span> {{ health_labels.crit }} <span class="ring-legend-count" style="color:{{ 'var(--crit)' if us_crit_c > 0 else 'var(--text-muted)' }};">{{ us_crit_c }}</span></div>
                 </div>
@@ -532,6 +550,7 @@
             </div>
             <div class="channel-health-chips">
                 <span class="health-chip"><span class="dot good"></span> {{ ds_good }} {{ health_labels.good }}</span>
+                <span class="health-chip"><span class="dot tolerated"></span> {{ ds_tolerated }} {{ health_labels.tolerated }}</span>
                 <span class="health-chip"><span class="dot warn"></span> {{ ds_warn }} {{ health_labels.warn }}</span>
                 <span class="health-chip"><span class="dot crit"></span> {{ ds_crit }} {{ health_labels.crit }}</span>
             </div>
@@ -552,19 +571,20 @@
                         </tr></thead>
                         <tbody>
                         {% for ch in group.list %}
-                        {% set ch_tips = {"power critical": t.ch_power_critical, "power warning": t.ch_power_warning, "snr critical": t.ch_snr_critical, "snr warning": t.ch_snr_warning} %}
+                        {% set ch_tips = {"power critical": t.ch_power_critical, "power warning": t.ch_power_warning, "power tolerated": t.ch_power_tolerated, "snr critical": t.ch_snr_critical, "snr warning": t.ch_snr_warning, "snr tolerated": t.ch_snr_tolerated} %}
                         {% set ch_tip_parts = [] %}
                         {% for key, label in ch_tips.items() %}{% if key in ch.health_detail %}{% if ch_tip_parts.append(label) %}{% endif %}{% endif %}{% endfor %}
                         <tr>
                             <td>{{ ch.channel_id }}</td>
                             <td>{{ ch.frequency }}{% if ch.frequency and 'MHz' not in ch.frequency|string %} MHz{% endif %}</td>
-                            <td class="{% if ch.power is not none %}{% if 'power critical' in ch.health_detail %}val-crit{% elif 'power warning' in ch.health_detail %}val-warn{% else %}val-good{% endif %}{% endif %}">{{ ch.power if ch.power is not none else "—" }}{% if ch.power is not none %} dBmV{% endif %}</td>
-                            <td class="{% if ch.snr is not none %}{% if 'snr critical' in ch.health_detail %}val-crit{% elif 'snr warning' in ch.health_detail %}val-warn{% else %}val-good{% endif %}{% endif %}">{{ ch.snr if ch.snr is not none else "—" }}{% if ch.snr is not none %} dB{% endif %}</td>
+                            <td class="{% if ch.power is not none %}{% if 'power critical' in ch.health_detail %}val-crit{% elif 'power warning' in ch.health_detail %}val-warn{% elif 'power tolerated' in ch.health_detail %}val-tolerated{% else %}val-good{% endif %}{% endif %}">{{ ch.power if ch.power is not none else "—" }}{% if ch.power is not none %} dBmV{% endif %}</td>
+                            <td class="{% if ch.snr is not none %}{% if 'snr critical' in ch.health_detail %}val-crit{% elif 'snr warning' in ch.health_detail %}val-warn{% elif 'snr tolerated' in ch.health_detail %}val-tolerated{% else %}val-good{% endif %}{% endif %}">{{ ch.snr if ch.snr is not none else "—" }}{% if ch.snr is not none %} dB{% endif %}</td>
                             <td>{{ ch.modulation }}</td>
                             <td>
                                 {% if ch.health == "good" %}<span class="badge badge-good">{{ health_labels.good }}</span>
                                 {% elif ch.health == "critical" %}<span class="badge badge-crit" title="{{ ch_tip_parts|join(', ') }}">{{ health_labels.crit }}</span>
-                                {% else %}<span class="badge badge-warn" title="{{ ch_tip_parts|join(', ') }}">{{ health_labels.warn }}</span>{% endif %}
+                                {% elif ch.health == "warning" %}<span class="badge badge-warn" title="{{ ch_tip_parts|join(', ') }}">{{ health_labels.warn }}</span>
+                                {% else %}<span class="badge badge-tolerated" title="{{ ch_tip_parts|join(', ') }}">{{ health_labels.tolerated }}</span>{% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -588,6 +608,7 @@
             </div>
             <div class="channel-health-chips">
                 <span class="health-chip"><span class="dot good"></span> {{ us_good_c }} {{ health_labels.good }}</span>
+                <span class="health-chip"><span class="dot tolerated"></span> {{ us_tolerated_c }} {{ health_labels.tolerated }}</span>
                 <span class="health-chip"><span class="dot warn"></span> {{ us_warn_c }} {{ health_labels.warn }}</span>
                 <span class="health-chip"><span class="dot crit"></span> {{ us_crit_c }} {{ health_labels.crit }}</span>
             </div>
@@ -609,18 +630,19 @@
                         <tbody>
                         {% for ch in group.list %}
                         {% set ch_tips = [] %}
-                        {% if 'power critical low' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_critical_low) %}{% elif 'power critical high' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_critical_high) %}{% elif 'power warning low' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_warning_low) %}{% elif 'power warning high' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_warning_high) %}{% endif %}
+                        {% if 'power critical low' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_critical_low) %}{% elif 'power critical high' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_critical_high) %}{% elif 'power warning low' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_warning_low) %}{% elif 'power warning high' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_warning_high) %}{% elif 'power tolerated low' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_tolerated_low) %}{% elif 'power tolerated high' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_power_tolerated_high) %}{% endif %}
                         {% if 'modulation critical' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_modulation_critical) %}{% elif 'modulation warning' in ch.health_detail %}{% set _ = ch_tips.append(t.ch_modulation_warning) %}{% endif %}
                         {% set ch_tip = ch_tips|join(', ') %}
                         <tr>
                             <td>{{ ch.channel_id }}</td>
                             <td>{{ ch.frequency }}{% if ch.frequency and 'MHz' not in ch.frequency|string %} MHz{% endif %}</td>
-                            <td class="{% if ch.power is not none %}{% if 'power critical' in ch.health_detail %}val-crit{% elif 'power warning' in ch.health_detail %}val-warn{% else %}val-good{% endif %}{% endif %}">{{ ch.power if ch.power is not none else "—" }}{% if ch.power is not none %} dBmV{% endif %}</td>
+                            <td class="{% if ch.power is not none %}{% if 'power critical' in ch.health_detail %}val-crit{% elif 'power warning' in ch.health_detail %}val-warn{% elif 'power tolerated' in ch.health_detail %}val-tolerated{% else %}val-good{% endif %}{% endif %}">{{ ch.power if ch.power is not none else "—" }}{% if ch.power is not none %} dBmV{% endif %}</td>
                             <td class="{% if ch.modulation %}{% if 'modulation critical' in ch.health_detail %}val-crit{% elif 'modulation warning' in ch.health_detail %}val-warn{% else %}val-good{% endif %}{% endif %}">{{ ch.modulation }}</td>
                             <td>
                                 {% if ch.health == "good" %}<span class="badge badge-good">{{ health_labels.good }}</span>
                                 {% elif ch.health == "critical" %}<span class="badge badge-crit" title="{{ ch_tip }}">{{ health_labels.crit }}</span>
-                                {% else %}<span class="badge badge-warn" title="{{ ch_tip }}">{{ health_labels.warn }}</span>{% endif %}
+                                {% elif ch.health == "warning" %}<span class="badge badge-warn" title="{{ ch_tip }}">{{ health_labels.warn }}</span>
+                                {% else %}<span class="badge badge-tolerated" title="{{ ch_tip }}">{{ health_labels.tolerated }}</span>{% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -1935,9 +1957,10 @@
         if (!container) return;
 
         var good = parseInt(container.getAttribute('data-good') || '0', 10);
+        var tolerated = parseInt(container.getAttribute('data-tolerated') || '0', 10);
         var warn = parseInt(container.getAttribute('data-warn') || '0', 10);
         var crit = parseInt(container.getAttribute('data-crit') || '0', 10);
-        var total = good + warn + crit;
+        var total = good + tolerated + warn + crit;
         if (total === 0) return;
 
         // Match mockup: raw Canvas arcs with thin stroke
@@ -1954,6 +1977,7 @@
         var styles = getComputedStyle(document.documentElement);
         var segments = [
             { val: good, color: styles.getPropertyValue('--good').trim() },
+            { val: tolerated, color: styles.getPropertyValue('--tolerated').trim() },
             { val: warn, color: styles.getPropertyValue('--warn').trim() },
             { val: crit, color: styles.getPropertyValue('--crit').trim() }
         ];

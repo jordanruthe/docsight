@@ -303,6 +303,7 @@ body.is-offline .offline-banner { display: flex; }
   flex-shrink: 0;
 }
 .hero-icon-wrap.good { background: var(--good-muted); color: var(--good); }
+.hero-icon-wrap.tolerated { background: var(--tolerated-muted); color: var(--tolerated); }
 .hero-icon-wrap.warn { background: var(--warn-muted); color: var(--warn); }
 .hero-icon-wrap.crit { background: var(--crit-muted); color: var(--crit); }
 .hero-icon-wrap svg { width: 22px; height: 22px; }
@@ -390,6 +391,7 @@ body.is-offline .offline-banner { display: flex; }
   justify-content: center;
   flex-shrink: 0;
 }
+.issue-icon.tolerated { background: var(--tolerated-muted); color: var(--tolerated); }
 .issue-icon.warn { background: var(--warn-muted); color: var(--warn); }
 .issue-icon.crit { background: var(--crit-muted); color: var(--crit); }
 .issue-icon svg { width: 16px; height: 16px; }
@@ -582,6 +584,7 @@ body.is-offline .offline-banner { display: flex; }
 }
 .health-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
 .health-chip .dot.good { background: var(--good); }
+.health-chip .dot.tolerated { background: var(--tolerated); }
 .health-chip .dot.warn { background: var(--warn); }
 .health-chip .dot.crit { background: var(--crit); }
 
@@ -615,6 +618,7 @@ body.is-offline .offline-banner { display: flex; }
 .channel-table tbody tr:active { background: rgba(255,255,255,0.04); }
 /* Value color utilities (used across channel, BNetzA, speedtest tables) */
 .val-good { color: var(--good); }
+.val-tolerated { color: var(--tolerated); }
 .val-warn { color: var(--warn); }
 .val-crit { color: var(--crit); }
 

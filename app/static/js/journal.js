@@ -1263,8 +1263,8 @@ function _renderTimelineTable(data) {
 
     var healthLabels = {
         good: T.health_good || 'Good',
+        tolerated: T.health_tolerated || 'Tolerated',
         marginal: T.health_marginal || 'Marginal',
-        poor: T.health_poor || 'Poor',
         critical: T.health_critical || 'Critical'
     };
 

@@ -96,53 +96,97 @@ class TestHealthGood:
         assert result["summary"]["health"] == "good"
 
 
-# -- Health assessment: marginal --
+# -- Health assessment: tolerated --
 
-class TestHealthMarginal:
-    def test_ds_power_warning(self):
-        """DS power 15 dBmV is marginal (>13, <20)."""
+class TestHealthTolerated:
+    def test_ds_power_tolerated(self):
+        """DS power 15 dBmV is tolerated (between good_max 13 and warn_max 18)."""
         data = _make_data(
             ds30=[_make_ds30(1, power=15.0, mse="-35")],
             us30=[_make_us30(1, power=44.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "marginal"
-        assert "ds_power_warn" in result["summary"]["health_issues"]
+        assert result["summary"]["health"] == "tolerated"
+        assert "ds_power_tolerated" in result["summary"]["health_issues"]
 
-    def test_us_power_warning_high(self):
-        """US power 49 dBmV triggers marginal (>47, <53)."""
+    def test_us_power_tolerated_high(self):
+        """US power 49 dBmV is tolerated (between good_max 47 and warn_max 51)."""
         data = _make_data(
             ds30=[_make_ds30(1, power=2.0, mse="-35")],
             us30=[_make_us30(1, power=49.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "marginal"
-        assert "us_power_warn_high" in result["summary"]["health_issues"]
+        assert result["summary"]["health"] == "tolerated"
+        assert "us_power_tolerated_high" in result["summary"]["health_issues"]
 
-    def test_us_power_warning_low(self):
-        """US power 40 dBmV triggers marginal (<41, >35)."""
+    def test_us_power_tolerated_low(self):
+        """US power 40 dBmV is tolerated (between warn_min 37.1 and good_min 41.1)."""
         data = _make_data(
             ds30=[_make_ds30(1, power=2.0, mse="-35")],
             us30=[_make_us30(1, power=40.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "marginal"
-        assert "us_power_warn_low" in result["summary"]["health_issues"]
+        assert result["summary"]["health"] == "tolerated"
+        assert "us_power_tolerated_low" in result["summary"]["health_issues"]
 
-    def test_snr_warning(self):
-        """SNR 31 dB is marginal (between 29-33)."""
+    def test_snr_tolerated(self):
+        """SNR 31 dB is tolerated (between warn_min 31 and good_min 33)."""
         data = _make_data(
             ds30=[_make_ds30(1, power=2.0, mse="-31")],
             us30=[_make_us30(1, power=42.0)],
         )
         result = analyze(data)
+        assert result["summary"]["health"] == "tolerated"
+        assert "snr_tolerated" in result["summary"]["health_issues"]
+
+
+# -- Health assessment: marginal --
+
+class TestHealthMarginal:
+    def test_ds_power_marginal(self):
+        """DS power 19 dBmV is marginal (between warn_max 18 and crit_max 20)."""
+        data = _make_data(
+            ds30=[_make_ds30(1, power=19.0, mse="-35")],
+            us30=[_make_us30(1, power=44.0)],
+        )
+        result = analyze(data)
         assert result["summary"]["health"] == "marginal"
-        assert "snr_warn" in result["summary"]["health_issues"]
+        assert "ds_power_marginal" in result["summary"]["health_issues"]
+
+    def test_us_power_marginal_high(self):
+        """US power 52 dBmV is marginal (between warn_max 51 and crit_max 53)."""
+        data = _make_data(
+            ds30=[_make_ds30(1, power=2.0, mse="-35")],
+            us30=[_make_us30(1, power=52.0)],
+        )
+        result = analyze(data)
+        assert result["summary"]["health"] == "marginal"
+        assert "us_power_marginal_high" in result["summary"]["health_issues"]
+
+    def test_us_power_marginal_low(self):
+        """US power 36 dBmV is marginal (between crit_min 35 and warn_min 37.1)."""
+        data = _make_data(
+            ds30=[_make_ds30(1, power=2.0, mse="-35")],
+            us30=[_make_us30(1, power=36.0)],
+        )
+        result = analyze(data)
+        assert result["summary"]["health"] == "marginal"
+        assert "us_power_marginal_low" in result["summary"]["health_issues"]
+
+    def test_snr_marginal(self):
+        """SNR 30.5 dB is marginal (between crit_min 30 and warn_min 31)."""
+        data = _make_data(
+            ds30=[_make_ds30(1, power=2.0, mse="-30.5")],
+            us30=[_make_us30(1, power=42.0)],
+        )
+        result = analyze(data)
+        assert result["summary"]["health"] == "marginal"
+        assert "snr_marginal" in result["summary"]["health_issues"]
 
 
-# -- Health assessment: poor --
+# -- Health assessment: critical --
 
-class TestHealthPoor:
+class TestHealthCritical:
     def test_ds_power_critical(self):
         """DS power 21 dBmV is critical (>20)."""
         data = _make_data(
@@ -150,7 +194,7 @@ class TestHealthPoor:
             us30=[_make_us30(1, power=44.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "ds_power_critical" in result["summary"]["health_issues"]
 
     def test_ds_power_critical_negative(self):
@@ -160,7 +204,7 @@ class TestHealthPoor:
             us30=[_make_us30(1, power=44.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "ds_power_critical" in result["summary"]["health_issues"]
 
     def test_us_power_critical_high(self):
@@ -170,7 +214,7 @@ class TestHealthPoor:
             us30=[_make_us30(1, power=55.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "us_power_critical_high" in result["summary"]["health_issues"]
 
     def test_us_power_critical_low(self):
@@ -180,17 +224,17 @@ class TestHealthPoor:
             us30=[_make_us30(1, power=33.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "us_power_critical_low" in result["summary"]["health_issues"]
 
     def test_snr_critical(self):
-        """SNR 27 dB is critical (<29)."""
+        """SNR 27 dB is critical (<30)."""
         data = _make_data(
             ds30=[_make_ds30(1, power=2.0, mse="-27")],
             us30=[_make_us30(1, power=42.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "snr_critical" in result["summary"]["health_issues"]
 
     def test_uncorrectable_errors(self):
@@ -201,7 +245,7 @@ class TestHealthPoor:
         )
         result = analyze(data)
         assert "uncorr_errors_high" in result["summary"]["health_issues"]
-        assert result["summary"]["health"] in ("marginal", "poor")
+        assert result["summary"]["health"] in ("tolerated", "marginal", "critical")
 
     def test_multiple_issues(self):
         """Multiple issues can coexist."""
@@ -210,7 +254,7 @@ class TestHealthPoor:
             us30=[_make_us30(1, power=55.0)],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         issues = result["summary"]["health_issues"]
         assert "ds_power_critical" in issues
         assert "us_power_critical_high" in issues
@@ -389,7 +433,7 @@ class TestUpstreamModulation:
         )
         result = analyze(data)
         assert result["summary"]["health"] == "marginal"
-        assert "us_modulation_warn" in result["summary"]["health_issues"]
+        assert "us_modulation_marginal" in result["summary"]["health_issues"]
         us_ch = result["us_channels"][0]
         assert us_ch["health"] == "warning"
         assert "modulation warning" in us_ch["health_detail"]
@@ -402,7 +446,7 @@ class TestUpstreamModulation:
         )
         result = analyze(data)
         assert result["summary"]["health"] == "marginal"
-        assert "us_modulation_warn" in result["summary"]["health_issues"]
+        assert "us_modulation_marginal" in result["summary"]["health_issues"]
 
     def test_4qam_critical(self):
         """4-QAM is critical (Rueckwegstoerer indicator)."""
@@ -411,7 +455,7 @@ class TestUpstreamModulation:
             us30=[_make_us30(1, power=42.0, modulation="4QAM")],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "us_modulation_critical" in result["summary"]["health_issues"]
         us_ch = result["us_channels"][0]
         assert us_ch["health"] == "critical"
@@ -424,7 +468,7 @@ class TestUpstreamModulation:
             us30=[_make_us30(1, power=42.0, modulation="QPSK")],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "us_modulation_critical" in result["summary"]["health_issues"]
 
     def test_mixed_channels(self):
@@ -439,7 +483,7 @@ class TestUpstreamModulation:
             ],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         assert "us_modulation_critical" in result["summary"]["health_issues"]
         healths = [c["health"] for c in result["us_channels"]]
         assert healths.count("critical") == 1
@@ -452,7 +496,7 @@ class TestUpstreamModulation:
             us30=[_make_us30(1, power=55.0, modulation="4QAM")],
         )
         result = analyze(data)
-        assert result["summary"]["health"] == "poor"
+        assert result["summary"]["health"] == "critical"
         issues = result["summary"]["health_issues"]
         assert "us_power_critical_high" in issues
         assert "us_modulation_critical" in issues
@@ -494,15 +538,15 @@ class TestOFDMThresholds:
         ch = result["ds_channels"][0]
         assert ch["health"] == "good"
 
-    def test_4096qam_snr_warning(self):
-        """4096QAM channel with MER 39.5 dB triggers SNR warning (good_min=40, crit=36)."""
+    def test_4096qam_snr_tolerated(self):
+        """4096QAM channel with MER 39.5 dB triggers SNR tolerated (good_min=40, warn_min=38, crit=36)."""
         data = _make_data(
             ds31=[_make_ds31(100, power=5.0, mer="39.5")],
             us30=[_make_us30(1, power=42.0)],
         )
         result = analyze(data)
         ch = result["ds_channels"][0]
-        assert "snr warning" in ch["health_detail"]
+        assert "snr tolerated" in ch["health_detail"]
 
     def test_4096qam_snr_critical(self):
         """4096QAM channel with MER 35 dB is critical (threshold: immediate_min=36)."""
@@ -531,8 +575,8 @@ class TestOFDMThresholds:
         )
         result = analyze(data)
         ch = result["ds_channels"][0]
-        # MER 39.5 is below 4096QAM good_min (40) but above crit (36), so warning
-        assert "snr warning" in ch["health_detail"]
+        # MER 39.5 is below 4096QAM good_min (40) but above warn_min (38), so tolerated
+        assert "snr tolerated" in ch["health_detail"]
 
 
 # -- Upstream bitrate calculation --
@@ -708,10 +752,11 @@ class TestOFDMAUpstream:
         health, detail = analyzer._assess_us_channel(ch)
         assert health == "good"
 
-    def test_ofdma_channel_warning(self):
+    def test_ofdma_channel_tolerated(self):
+        """OFDMA power 40.5 is tolerated (between warn_min 40.1 and good_min 44.1)."""
         ch = {"powerLevel": "40.5", "modulation": "OFDMA", "type": "OFDMA"}
         health, detail = analyzer._assess_us_channel(ch)
-        assert health == "warning"
+        assert health == "tolerated"
 
     def test_ofdma_channel_critical_low(self):
         ch = {"powerLevel": "37.0", "modulation": "OFDMA", "type": "OFDMA"}
@@ -777,7 +822,7 @@ class TestSpikeExpiryThreshold:
 class TestSpikeSuppression:
     """Tests for apply_spike_suppression()."""
 
-    def _make_analysis_with_uncorr(self, uncorr_pct=86.6, health="poor",
+    def _make_analysis_with_uncorr(self, uncorr_pct=86.6, health="critical",
                                     extra_issues=None):
         """Build a minimal analysis dict with uncorrectable error issues."""
         issues = ["uncorr_errors_critical"]
@@ -804,7 +849,7 @@ class TestSpikeSuppression:
         apply_spike_suppression(analysis, None)
         assert analysis["summary"]["ds_uncorr_pct"] == 86.6
         assert "uncorr_errors_critical" in analysis["summary"]["health_issues"]
-        assert analysis["summary"]["health"] == "poor"
+        assert analysis["summary"]["health"] == "critical"
         assert "spike_suppression" not in analysis["summary"]
 
     @patch("app.analyzer.utc_now")
@@ -816,7 +861,7 @@ class TestSpikeSuppression:
         apply_spike_suppression(analysis, "2026-02-27T14:00:00Z")
         assert analysis["summary"]["ds_uncorr_pct"] == 86.6
         assert "uncorr_errors_critical" in analysis["summary"]["health_issues"]
-        assert analysis["summary"]["health"] == "poor"
+        assert analysis["summary"]["health"] == "critical"
         assert "spike_suppression" not in analysis["summary"]
 
     @patch("app.analyzer.utc_now")
@@ -847,16 +892,16 @@ class TestSpikeSuppression:
         assert analysis["summary"]["ds_uncorr_pct"] == 0.0
         assert "uncorr_errors_critical" not in analysis["summary"]["health_issues"]
         assert "snr_critical" in analysis["summary"]["health_issues"]
-        assert analysis["summary"]["health"] == "poor"
+        assert analysis["summary"]["health"] == "critical"
         assert analysis["summary"]["spike_suppression"]["active"] is True
 
     @patch("app.analyzer.utc_now")
     def test_expired_spike_warning_issues_marginal(self, mock_now):
-        """Spike expired, only warning issues remain — health becomes marginal."""
+        """Spike expired, only marginal issues remain — health becomes marginal."""
         from app.analyzer import apply_spike_suppression
         mock_now.return_value = "2026-03-01T15:00:00Z"
         analysis = self._make_analysis_with_uncorr(
-            extra_issues=["snr_warn"]
+            extra_issues=["snr_marginal"]
         )
         apply_spike_suppression(analysis, "2026-02-27T14:00:00Z")
         assert analysis["summary"]["health"] == "marginal"

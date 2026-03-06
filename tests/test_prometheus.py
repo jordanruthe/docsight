@@ -280,19 +280,24 @@ class TestSummaryMetrics:
         out = format_metrics(ANALYSIS_FULL, None, None, 0.0)
         assert _has_metric(out, "docsight_health_status 0")
 
-    def test_health_marginal_is_1(self):
-        analysis = {**ANALYSIS_FULL, "summary": {**ANALYSIS_FULL["summary"], "health": "marginal"}}
+    def test_health_tolerated_is_1(self):
+        analysis = {**ANALYSIS_FULL, "summary": {**ANALYSIS_FULL["summary"], "health": "tolerated"}}
         out = format_metrics(analysis, None, None, 0.0)
         assert _has_metric(out, "docsight_health_status 1")
 
-    def test_health_poor_is_2(self):
-        analysis = {**ANALYSIS_FULL, "summary": {**ANALYSIS_FULL["summary"], "health": "poor"}}
+    def test_health_marginal_is_2(self):
+        analysis = {**ANALYSIS_FULL, "summary": {**ANALYSIS_FULL["summary"], "health": "marginal"}}
         out = format_metrics(analysis, None, None, 0.0)
         assert _has_metric(out, "docsight_health_status 2")
 
-    def test_health_none_analysis_is_3(self):
-        out = format_metrics(None, None, None, 0.0)
+    def test_health_critical_is_3(self):
+        analysis = {**ANALYSIS_FULL, "summary": {**ANALYSIS_FULL["summary"], "health": "critical"}}
+        out = format_metrics(analysis, None, None, 0.0)
         assert _has_metric(out, "docsight_health_status 3")
+
+    def test_health_none_analysis_is_4(self):
+        out = format_metrics(None, None, None, 0.0)
+        assert _has_metric(out, "docsight_health_status 4")
 
     def test_ds_channels_total(self):
         out = format_metrics(ANALYSIS_FULL, None, None, 0.0)
@@ -473,7 +478,7 @@ class TestEdgeCases:
         assert isinstance(out, str)
         assert len(out) > 0
         assert out.endswith("\n")
-        assert _has_metric(out, "docsight_health_status 3")
+        assert _has_metric(out, "docsight_health_status 4")
         assert _has_metric(out, "docsight_last_poll_timestamp_seconds 0.0")
 
     def test_empty_channels_no_per_channel_lines(self):

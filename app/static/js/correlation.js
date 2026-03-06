@@ -366,10 +366,12 @@ function renderCorrelationChart(data) {
             var x1 = xScale(new Date(modem[i].timestamp).getTime());
             var x2 = i < modem.length - 1 ? xScale(new Date(modem[i + 1].timestamp).getTime()) : x1 + 2;
             var h = modem[i].health;
-            if (h === 'poor' || h === 'critical') {
+            if (h === 'critical') {
                 ctx.fillStyle = 'rgba(244,67,54,0.08)';
             } else if (h === 'marginal') {
                 ctx.fillStyle = 'rgba(255,152,0,0.06)';
+            } else if (h === 'tolerated') {
+                ctx.fillStyle = 'rgba(132,204,22,0.06)';
             } else {
                 continue;
             }
@@ -1088,8 +1090,8 @@ function renderCorrelationTable(data) {
 
     var healthLabels = {
         good: T.health_good,
+        tolerated: T.health_tolerated,
         marginal: T.health_marginal,
-        poor: T.health_poor,
         critical: T.health_critical
     };
     var sevLabels = {

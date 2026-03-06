@@ -50,6 +50,8 @@ def _score_docsis_health(health):
     """Score DOCSIS health status."""
     if health == "good":
         return 100
+    if health == "tolerated":
+        return 75
     if health == "marginal":
         return 50
     return 0
