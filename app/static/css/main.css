@@ -342,6 +342,21 @@ body.is-offline .offline-banner { display: flex; }
   font-size: 0.78rem;
   color: var(--text-secondary);
   white-space: nowrap;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-pill);
+  transition: background 0.2s;
+}
+.hero-meta-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+[data-theme="light"] .hero-meta-item {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .hero-meta-item:hover {
+  background: rgba(0, 0, 0, 0.07);
 }
 .hero-meta-item svg { width: 13px; height: 13px; opacity: 0.6; }
 #desktop-countdown, #topbar-countdown { min-width: 3ch; font-variant-numeric: tabular-nums; }
