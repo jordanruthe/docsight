@@ -46,7 +46,7 @@ For a containerized dev environment:
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 
-This runs on port **8766** (`http://localhost:8766`). Production uses `docker-compose.yml` on port 8765.
+This runs on port **8767** (`http://localhost:8767`) in demo mode. Production uses `docker-compose.yml` on port 8765.
 
 ## Running Tests
 
@@ -54,7 +54,7 @@ This runs on port **8766** (`http://localhost:8766`). Production uses `docker-co
 python -m pytest tests/ -v
 ```
 
-268 tests cover analyzers, collectors, drivers, event detection, API endpoints, config, MQTT, i18n, and PDF generation. All tests must pass before submitting a PR.
+1100+ tests cover analyzers, collectors, drivers, event detection, API endpoints, config, MQTT, i18n, and PDF generation. All tests must pass before submitting a PR.
 
 ## Running Locally
 
@@ -74,24 +74,20 @@ app/
   event_detector.py  - Signal anomaly detection (thread-safe)
   thresholds.json    - Configurable signal thresholds (VFKD guidelines)
   config.py          - Configuration management (env + config.json)
-  storage.py         - SQLite snapshot storage (WAL mode)
-  mqtt_publisher.py  - MQTT Auto-Discovery for Home Assistant
-  report.py          - Incident Report PDF generator (fpdf2)
-  thinkbroadband.py  - BQM integration
+  storage/           - SQLite storage (base + mixins), WAL mode, thread-safe
   collectors/        - Collector implementations (modem, demo, speedtest, bqm)
     base.py          - Abstract Collector with fail-safe and locking
     __init__.py      - Registry and discover_collectors()
-  drivers/           - Modem driver implementations
+  drivers/           - Modem driver implementations (11 drivers)
     base.py          - Abstract ModemDriver interface
-    fritzbox.py      - AVM FRITZ!Box (data.lua / TR-064)
-    tc4400.py        - Technicolor TC4400 (SNMP)
-    ultrahub7.py     - Vodafone Ultra Hub 7
-    vodafone_station.py - Vodafone Station (CGA + TG auto-detection)
+    registry.py      - Driver registry (auto-detection + manual selection)
+  modules/           - Built-in modules (backup, bnetz, bqm, journal, mqtt, ...)
+  blueprints/        - Flask blueprints (config, polling, data, analysis, ...)
   i18n/              - Translation files (EN/DE/FR/ES JSON)
   fonts/             - Bundled DejaVu fonts for PDF generation
   static/            - Static assets (icons, etc.)
   templates/         - Jinja2 HTML templates
-tests/               - pytest test suite (268 tests)
+tests/               - pytest test suite (1100+ tests)
 docker-compose.yml     - Production Docker setup
 docker-compose.dev.yml - Development Docker setup
 ```

@@ -1,6 +1,6 @@
 # DOCSight Architecture
 
-> Documentation current as of **v2026-03-06.2**
+> Documentation current as of **v2026-03-07.1**
 
 This document describes the technical architecture of DOCSight.
 
@@ -397,6 +397,10 @@ class ModemDriver(ABC):
 | `cm3500` | `cm3500.py` | Arris CM3500B | Form POST (IP-based session) |
 | `connectbox` | `connectbox.py` | Unitymedia Connect Box (CH7465) | Session cookie |
 | `vodafone_station` | `vodafone_station.py` | CGA6444VF, CGA4322DE, TG3442DE | Auto-detected (see below) |
+| `cm3000` | `cm3000.py` | Netgear CM3000 | HTTP Basic Auth |
+| `surfboard` | `surfboard.py` | Arris SURFboard S33/S34/SB8200 | HNAP1 HMAC-SHA256 |
+| `cm8200` | `cm8200.py` | Arris Touchstone CM8200A | Base64 query string |
+| `generic` | `generic.py` | Generic Router (no DOCSIS) | None |
 
 ### Driver Registry (`app/drivers/__init__.py`)
 
@@ -824,7 +828,7 @@ def test_my_collector_success():
 ## Testing
 
 **Framework:** pytest
-**Coverage:** 454 tests
+**Coverage:** 1100+ tests
 
 **Run tests:**
 ```bash
@@ -857,7 +861,7 @@ python -m pytest tests/ -v
 **Optimization:**
 - Speedtest results cached locally (reduces API calls)
 - SQLite with indexes for fast queries
-- Chart.js loaded from CDN (reduces image size)
+- uPlot for lightweight charting (~50KB vs Chart.js 204KB)
 
 ---
 

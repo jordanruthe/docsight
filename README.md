@@ -160,7 +160,10 @@ Open `http://localhost:8765` — no setup required.
 | | Status | Notes |
 |---|---|---|
 | **Arris CM3500B** | ✅ Fully supported | HTTPS enforced, mixed DOCSIS 3.0/3.1 |
+| **Arris SURFboard** (S33, S34, SB8200) | ✅ Fully supported | HNAP1 API |
+| **Arris Touchstone CM8200A** | ✅ Fully supported | ISP-branded DOCSIS 3.1 |
 | **AVM Fritz!Box Cable** (6490, 6590, 6591, 6660, 6690) | ✅ Fully supported | |
+| **Netgear CM3000** | ✅ Fully supported | DOCSIS 3.1 standalone |
 | **Unitymedia Connect Box** (CH7465) | ✅ Fully supported | |
 | **Vodafone Station** (CGA4233, TG3442DE) | ✅ Fully supported | Bridge mode compatible |
 | **Technicolor TC4400** | ✅ Fully supported | |
@@ -302,7 +305,7 @@ If DOCSight helps you, you can support development here:
 
 ## Documentation
 
-Documentation current as of **v2026-03-06.3**.
+Documentation current as of **v2026-03-07.1**.
 
 | Document | Scope |
 |---|---|
