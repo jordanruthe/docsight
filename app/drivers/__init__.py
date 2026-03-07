@@ -25,6 +25,9 @@ driver_registry.register_builtin("cm3500", "app.drivers.cm3500.CM3500Driver", "A
 driver_registry.register_builtin("surfboard", "app.drivers.surfboard.SurfboardDriver",
                                  "Arris SURFboard (S33/S34/SB8200)",
                                  hints={"default_url": "https://192.168.100.1", "default_user": "admin"})
+driver_registry.register_builtin("cm8200", "app.drivers.cm8200.CM8200Driver",
+                                 "Arris Touchstone CM8200A",
+                                 hints={"default_url": "https://192.168.100.1", "default_user": "admin"})
 driver_registry.register_builtin("generic", "app.drivers.generic.GenericDriver", "Generic Router (No DOCSIS)",
                                  hints={"credentials_required": False})
 
