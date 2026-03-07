@@ -149,6 +149,15 @@ class CM8200Driver(ModemDriver):
 
         return ds_table, us_table
 
+    @staticmethod
+    def _is_header_row(row) -> bool:
+        """True if row is a table title or column-header row (not data)."""
+        if row.find("th"):
+            return True
+        if row.find("strong"):
+            return True
+        return False
+
     def _parse_downstream(self, table) -> tuple:
         """Parse downstream table into (docsis30, docsis31) channel lists.
 
@@ -161,8 +170,9 @@ class CM8200Driver(ModemDriver):
             return ds30, ds31
 
         rows = table.find_all("tr")
-        # Skip header rows (first row is title, second is column headers)
-        for row in rows[2:]:
+        for row in rows:
+            if self._is_header_row(row):
+                continue
             cells = [td.get_text(strip=True) for td in row.find_all("td")]
             if len(cells) < 8:
                 continue
@@ -217,7 +227,9 @@ class CM8200Driver(ModemDriver):
             return us30, us31
 
         rows = table.find_all("tr")
-        for row in rows[2:]:
+        for row in rows:
+            if self._is_header_row(row):
+                continue
             cells = [td.get_text(strip=True) for td in row.find_all("td")]
             if len(cells) < 7:
                 continue

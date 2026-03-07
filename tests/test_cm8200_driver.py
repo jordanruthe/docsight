@@ -382,6 +382,65 @@ class TestEdgeCases:
             data = driver.get_docsis_data()
             assert len(data["channelDs"]["docsis30"]) == 1
 
+    def test_missing_tr_on_column_headers(self, driver):
+        """Real CM8200 HTML has no <tr> before column-header <td>s.
+
+        BeautifulSoup merges the orphaned <td>s into the first data row,
+        so the column-header row disappears and data starts at rows[1].
+        The driver must not skip real data by assuming rows[2:].
+        """
+        from bs4 import BeautifulSoup
+        # Reproduces the real CM8200 HTML structure (missing <tr> before column headers)
+        html = """<html><body>
+        <table class='simpleTable'>
+        <tr><th colspan=8><strong>Downstream Bonded Channels</strong></th></tr>
+            <td><strong>Channel ID</strong></td>
+            <td><strong>Lock Status</strong></td>
+            <td><strong>Modulation</strong></td>
+            <td><strong>Frequency</strong></td>
+            <td><strong>Power</strong></td>
+            <td><strong>SNR/MER</strong></td>
+            <td><strong>Corrected</strong></td>
+            <td><strong>Uncorrectables</strong></td>
+        </tr>
+        <tr align='left'>
+            <td>33</td><td>Locked</td><td>Other</td><td>795000000 Hz</td>
+            <td>8.2 dBmV</td><td>43.0 dB</td><td>191405078</td><td>0</td>
+        </tr>
+        <tr align='left'>
+            <td>1</td><td>Locked</td><td>QAM256</td><td>561000000 Hz</td>
+            <td>4.9 dBmV</td><td>43.4 dB</td><td>17</td><td>0</td>
+        </tr>
+        </table>
+
+        <table class='simpleTable'>
+        <tr><th colspan=7><strong>Upstream Bonded Channels</strong></th></tr>
+            <td><strong>Channel</strong></td>
+            <td><strong>Channel ID</strong></td>
+            <td><strong>Lock Status</strong></td>
+            <td><strong>US Channel Type</td>
+            <td><strong>Frequency</strong></td>
+            <td><strong>Width</strong></td>
+            <td><strong>Power</strong></td>
+        </tr>
+        <tr align='left'>
+            <td>1</td><td>3</td><td>Locked</td><td>SC-QAM Upstream</td>
+            <td>15500000 Hz</td><td>3200000 Hz</td><td>48.0 dBmV</td>
+        </tr>
+        </table>
+        </body></html>"""
+        soup = BeautifulSoup(html, "html.parser")
+        with patch.object(driver, "_fetch_status_page", return_value=soup):
+            data = driver.get_docsis_data()
+            # Must find both channels despite malformed HTML
+            assert len(data["channelDs"]["docsis31"]) == 1
+            assert len(data["channelDs"]["docsis30"]) == 1
+            assert data["channelDs"]["docsis31"][0]["channelID"] == 33
+            assert data["channelDs"]["docsis30"][0]["channelID"] == 1
+            # Upstream too
+            assert len(data["channelUs"]["docsis30"]) == 1
+            assert data["channelUs"]["docsis30"][0]["channelID"] == 3
+
     def test_status_html_cache_consumed(self, driver):
         """Cached HTML from login is consumed on first fetch, then cleared."""
         driver._status_html = SAMPLE_STATUS_HTML
