@@ -49,7 +49,7 @@
         var container = getContainer();
         if (!container) return;
 
-        fetch('/api/trends')
+        fetch('/api/trends?range=week')
             .then(function(r) {
                 if (!r.ok) throw new Error('API error: ' + r.status);
                 return r.json();
