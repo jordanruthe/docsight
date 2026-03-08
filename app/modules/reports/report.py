@@ -321,9 +321,9 @@ REPORT_STRINGS = {
         "complaint_short_closing": "Sincerely,\n[Your Name]",
         # Diagnostic notes
         "section_diagnostic_notes": "Diagnostic Notes",
-        "diag_note_high": "Channel {ch} ({ch_type}): {metric} of {value} dBmV exceeds DOCSIS specification maximum ({spec} dBmV) by {pct}%.",
-        "diag_note_low": "Channel {ch} ({ch_type}): {metric} of {value} dBmV is below DOCSIS specification minimum ({spec} dBmV) by {pct}%.",
-        "diag_note_snr_low": "Channel {ch} ({ch_type}): {metric} of {value} dB is below DOCSIS specification minimum ({spec} dB) by {pct}%.",
+        "diag_note_high": "Channel {ch} ({ch_type}): {metric} of {value} dBmV exceeds expected maximum ({spec} dBmV) by {pct}%.",
+        "diag_note_low": "Channel {ch} ({ch_type}): {metric} of {value} dBmV is below expected minimum ({spec} dBmV) by {pct}%.",
+        "diag_note_snr_low": "Channel {ch} ({ch_type}): {metric} of {value} dB is below expected minimum ({spec} dB) by {pct}%.",
         "diag_note_isp_hint": "Values this far outside specification typically indicate an ISP-side configuration or infrastructure issue, not a customer equipment problem.",
         "complaint_diag_header": "Diagnostic analysis:",
         # Incident-scoped report
@@ -463,9 +463,9 @@ REPORT_STRINGS = {
         "complaint_short_closing": "Mit freundlichen Grüßen\n[Ihr Name]",
         # Diagnostic notes
         "section_diagnostic_notes": "Diagnostische Hinweise",
-        "diag_note_high": "Kanal {ch} ({ch_type}): {metric} von {value} dBmV überschreitet das DOCSIS-Spezifikationsmaximum ({spec} dBmV) um {pct}%.",
-        "diag_note_low": "Kanal {ch} ({ch_type}): {metric} von {value} dBmV unterschreitet das DOCSIS-Spezifikationsminimum ({spec} dBmV) um {pct}%.",
-        "diag_note_snr_low": "Kanal {ch} ({ch_type}): {metric} von {value} dB unterschreitet das DOCSIS-Spezifikationsminimum ({spec} dB) um {pct}%.",
+        "diag_note_high": "Kanal {ch} ({ch_type}): {metric} von {value} dBmV überschreitet den erwarteten Maximalwert ({spec} dBmV) um {pct}%.",
+        "diag_note_low": "Kanal {ch} ({ch_type}): {metric} von {value} dBmV unterschreitet den erwarteten Minimalwert ({spec} dBmV) um {pct}%.",
+        "diag_note_snr_low": "Kanal {ch} ({ch_type}): {metric} von {value} dB unterschreitet den erwarteten Minimalwert ({spec} dB) um {pct}%.",
         "diag_note_isp_hint": "Werte, die so weit außerhalb der Spezifikation liegen, deuten typischerweise auf ein anbieterseitiges Konfigurations- oder Infrastrukturproblem hin, nicht auf ein Problem der Kundengeräte.",
         "complaint_diag_header": "Diagnostische Analyse:",
         # Incident-scoped report
@@ -605,9 +605,9 @@ REPORT_STRINGS = {
         "complaint_short_closing": "Veuillez agréer mes salutations distinguées,\n[Votre nom]",
         # Diagnostic notes
         "section_diagnostic_notes": "Notes de diagnostic",
-        "diag_note_high": "Canal {ch} ({ch_type}) : {metric} de {value} dBmV dépasse le maximum de la spécification DOCSIS ({spec} dBmV) de {pct}%.",
-        "diag_note_low": "Canal {ch} ({ch_type}) : {metric} de {value} dBmV est inférieur au minimum de la spécification DOCSIS ({spec} dBmV) de {pct}%.",
-        "diag_note_snr_low": "Canal {ch} ({ch_type}) : {metric} de {value} dB est inférieur au minimum de la spécification DOCSIS ({spec} dB) de {pct}%.",
+        "diag_note_high": "Canal {ch} ({ch_type}) : {metric} de {value} dBmV dépasse le maximum attendu ({spec} dBmV) de {pct}%.",
+        "diag_note_low": "Canal {ch} ({ch_type}) : {metric} de {value} dBmV est inférieur au minimum attendu ({spec} dBmV) de {pct}%.",
+        "diag_note_snr_low": "Canal {ch} ({ch_type}) : {metric} de {value} dB est inférieur au minimum attendu ({spec} dB) de {pct}%.",
         "diag_note_isp_hint": "Des valeurs aussi éloignées de la spécification indiquent généralement un problème de configuration ou d'infrastructure côté FAI, et non un problème d'équipement client.",
         "complaint_diag_header": "Analyse diagnostique :",
         # Incident-scoped report
@@ -748,9 +748,9 @@ REPORT_STRINGS = {
         "complaint_short_closing": "Atentamente,\n[Su nombre]",
         # Diagnostic notes
         "section_diagnostic_notes": "Notas de diagnóstico",
-        "diag_note_high": "Canal {ch} ({ch_type}): {metric} de {value} dBmV supera el máximo de la especificación DOCSIS ({spec} dBmV) en un {pct}%.",
-        "diag_note_low": "Canal {ch} ({ch_type}): {metric} de {value} dBmV está por debajo del mínimo de la especificación DOCSIS ({spec} dBmV) en un {pct}%.",
-        "diag_note_snr_low": "Canal {ch} ({ch_type}): {metric} de {value} dB está por debajo del mínimo de la especificación DOCSIS ({spec} dB) en un {pct}%.",
+        "diag_note_high": "Canal {ch} ({ch_type}): {metric} de {value} dBmV supera el máximo esperado ({spec} dBmV) en un {pct}%.",
+        "diag_note_low": "Canal {ch} ({ch_type}): {metric} de {value} dBmV está por debajo del mínimo esperado ({spec} dBmV) en un {pct}%.",
+        "diag_note_snr_low": "Canal {ch} ({ch_type}): {metric} de {value} dB está por debajo del mínimo esperado ({spec} dB) en un {pct}%.",
         "diag_note_isp_hint": "Valores tan alejados de la especificación suelen indicar un problema de configuración o infraestructura del proveedor, no un problema del equipo del cliente.",
         "complaint_diag_header": "Análisis diagnóstico:",
         # Incident-scoped report
