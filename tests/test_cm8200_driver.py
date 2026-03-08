@@ -114,20 +114,24 @@ class TestDriverInit:
 # -- Login --
 
 class TestLogin:
-    def test_base64_credentials_in_url(self, driver):
-        """Login sends GET with base64(user:pass) as query string."""
+    def test_two_step_auth_flow(self, driver):
+        """Login sends two GETs: first with credentials, then bare."""
         expected_creds = base64.b64encode(b"admin:password").decode()
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()
-        mock_response.text = "<html></html>"
+        mock_response.text = SAMPLE_STATUS_HTML
 
         with patch.object(driver._session, "get", return_value=mock_response) as mock_get:
             driver.login()
 
-            call_args = mock_get.call_args
-            url = call_args[0][0] if call_args[0] else call_args.kwargs["url"]
-            assert f"?{expected_creds}" in url
-            assert "/cmconnectionstatus.html" in url
+            assert mock_get.call_count == 2
+            # First call: with credentials
+            url1 = mock_get.call_args_list[0][0][0]
+            assert f"?{expected_creds}" in url1
+            # Second call: bare GET for status page
+            url2 = mock_get.call_args_list[1][0][0]
+            assert url2.endswith("/cmconnectionstatus.html")
+            assert "?" not in url2
 
     def test_login_retries_on_connection_error(self, driver):
         import requests as req
@@ -154,7 +158,8 @@ class TestLogin:
                 driver.login()
 
         assert len(call_count) == 1
-        mock_new_session.get.assert_called_once()
+        # Retry uses fresh session: 2 GETs (auth + status)
+        assert mock_new_session.get.call_count == 2
 
     def test_login_raises_after_retry_exhausted(self, driver):
         import requests as req
@@ -176,12 +181,15 @@ class TestLogin:
                 driver.login()
 
     def test_login_caches_status_html(self, driver):
-        """Login caches the response for reuse by get_docsis_data."""
-        mock_response = MagicMock()
-        mock_response.raise_for_status = MagicMock()
-        mock_response.text = SAMPLE_STATUS_HTML
+        """Login caches the second response (status page) for reuse."""
+        auth_response = MagicMock()
+        auth_response.text = "1"  # session token
 
-        with patch.object(driver._session, "get", return_value=mock_response):
+        status_response = MagicMock()
+        status_response.raise_for_status = MagicMock()
+        status_response.text = SAMPLE_STATUS_HTML
+
+        with patch.object(driver._session, "get", side_effect=[auth_response, status_response]):
             driver.login()
 
         assert driver._status_html == SAMPLE_STATUS_HTML

@@ -16,13 +16,34 @@ DOCSIS version is inferred from modulation/channel type:
 
 import base64
 import logging
+import ssl
 
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.ssl_ import create_urllib3_context
 
 from .base import ModemDriver
 
 log = logging.getLogger("docsis.driver.cm8200")
+
+
+class _LegacyTLSAdapter(HTTPAdapter):
+    """Allow 1024-bit RSA keys for ancient modem certs.
+
+    The CM8200A ships with a Broadcom factory certificate using a 1024-bit
+    RSA key.  Modern OpenSSL defaults reject keys smaller than 2048 bits,
+    causing a TLS handshake failure.  This adapter lowers the security
+    level for connections to the modem only.
+    """
+
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = create_urllib3_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        ctx.set_ciphers("DEFAULT:@SECLEVEL=0")
+        kwargs["ssl_context"] = ctx
+        super().init_poolmanager(*args, **kwargs)
 
 
 class CM8200Driver(ModemDriver):
@@ -39,10 +60,15 @@ class CM8200Driver(ModemDriver):
         super().__init__(url, user, password)
         self._session = requests.Session()
         self._session.verify = False
+        self._session.mount("https://", _LegacyTLSAdapter())
         self._status_html = None
 
     def login(self) -> None:
         """Authenticate via base64 credentials in query string.
+
+        The CM8200A uses IP-based sessions: the first GET with credentials
+        establishes the session server-side, then a second bare GET returns
+        the actual status page HTML.
 
         Retries once with a fresh connection if the modem drops a stale
         TCP connection (common after container restarts).
@@ -50,8 +76,12 @@ class CM8200Driver(ModemDriver):
         creds = base64.b64encode(f"{self._user}:{self._password}".encode()).decode()
         for attempt in range(2):
             try:
-                r = self._session.get(
+                self._session.get(
                     f"{self._url}/cmconnectionstatus.html?{creds}",
+                    timeout=30,
+                )
+                r = self._session.get(
+                    f"{self._url}/cmconnectionstatus.html",
                     timeout=30,
                 )
                 r.raise_for_status()
@@ -64,6 +94,7 @@ class CM8200Driver(ModemDriver):
                     self._session.close()
                     self._session = requests.Session()
                     self._session.verify = False
+                    self._session.mount("https://", _LegacyTLSAdapter())
                     continue
                 raise RuntimeError("CM8200 authentication failed: connection refused after retry")
             except requests.RequestException as e:
@@ -77,6 +108,12 @@ class CM8200Driver(ModemDriver):
         """
         soup = self._fetch_status_page()
         ds_table, us_table = self._find_channel_tables(soup)
+        if not ds_table and not us_table:
+            tables = soup.find_all("table")
+            log.debug("CM8200 found %d tables but no channel tables", len(tables))
+            for i, t in enumerate(tables[:5]):
+                header = t.find("tr")
+                log.debug("CM8200 table[%d] header: %s", i, header.get_text(strip=True)[:120] if header else "(none)")
 
         ds30, ds31 = self._parse_downstream(ds_table)
         us30, us31 = self._parse_upstream(us_table)
@@ -110,13 +147,20 @@ class CM8200Driver(ModemDriver):
         """Fetch and parse the status page HTML.
 
         Reuses cached HTML from login if available (same page).
+        Re-authenticates when the cache has been consumed.
         """
         if self._status_html:
             html = self._status_html
             self._status_html = None
+            log.debug("CM8200 using cached status HTML (%d bytes)", len(html))
             return BeautifulSoup(html, "html.parser")
 
+        creds = base64.b64encode(f"{self._user}:{self._password}".encode()).decode()
         try:
+            self._session.get(
+                f"{self._url}/cmconnectionstatus.html?{creds}",
+                timeout=30,
+            )
             r = self._session.get(
                 f"{self._url}/cmconnectionstatus.html",
                 timeout=30,
@@ -124,6 +168,7 @@ class CM8200Driver(ModemDriver):
             r.raise_for_status()
         except requests.RequestException as e:
             raise RuntimeError(f"CM8200 status page retrieval failed: {e}")
+        log.debug("CM8200 status page fetched (%d bytes)", len(r.text))
         return BeautifulSoup(r.text, "html.parser")
 
     @staticmethod
