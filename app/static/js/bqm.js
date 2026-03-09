@@ -579,7 +579,7 @@ function executeBqmImport() {
             showBqmImportResult(data);
         })
         .catch(function(err) {
-            showToast('Import failed: ' + err.message, 'error');
+            showToast((T.bqm_import_failed || 'Import failed: {0}').replace('{0}', err.message), 'error');
             btn.disabled = false;
             var label = (T.bqm_import_btn || 'Import {0} images').replace('{0}', _bqmImportFiles.length);
             btn.textContent = label;
@@ -701,7 +701,7 @@ function deleteBqmImages() {
             _bqmRangeEnd = null;
             fetchBqmDates(function() { renderBqmCalendar(_bqmCalYear, _bqmCalMonth); });
         })
-        .catch(function(err) { showToast('Delete failed: ' + err.message, 'error'); });
+        .catch(function(err) { showToast((T.bqm_delete_failed || 'Delete failed: {0}').replace('{0}', err.message), 'error'); });
     } else {
         // Delete all
         var msg = (T.bqm_delete_all || 'Delete all {0} BQM images?').replace('{0}', totalCount);
@@ -722,7 +722,7 @@ function deleteBqmImages() {
             _bqmRangeEnd = null;
             fetchBqmDates(function() { renderBqmCalendar(_bqmCalYear, _bqmCalMonth); });
         })
-        .catch(function(err) { showToast('Delete failed: ' + err.message, 'error'); });
+        .catch(function(err) { showToast((T.bqm_delete_failed || 'Delete failed: {0}').replace('{0}', err.message), 'error'); });
     }
 }
 

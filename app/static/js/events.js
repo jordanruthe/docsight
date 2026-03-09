@@ -29,8 +29,9 @@ function _fmtNum(n) {
 }
 
 function _healthDot(h) {
-    var cls = (h === 'good' || h === 'marginal' || h === 'poor') ? h : 'unknown';
-    return '<span class="health-dot ' + cls + '"></span>' + escapeHtml(h);
+    var cls = (h === 'good' || h === 'marginal' || h === 'poor' || h === 'tolerated') ? h : 'unknown';
+    var labels = {good: T.health_good || 'Good', tolerated: T.health_tolerated || 'Tolerated', marginal: T.health_marginal || 'Marginal', poor: T.health_critical || 'Critical'};
+    return '<span class="health-dot ' + cls + '"></span>' + escapeHtml(labels[h] || h);
 }
 
 function formatEventMessage(ev) {
@@ -60,7 +61,7 @@ function formatEventMessage(ev) {
                 '<span class="ev-val">' + _fmtNum(d.prev) + '</span>' +
                 '<i data-lucide="arrow-right" class="ev-arrow-icon"></i>' +
                 '<span class="ev-val ' + thr + '">' + _fmtNum(d.current) + '</span> dB ' +
-                '<span class="ev-muted">(' + escapeHtml(d.threshold) + ')</span>';
+                '<span class="ev-muted">(' + escapeHtml({warning: T.health_marginal || 'Marginal', critical: T.health_critical || 'Critical'}[d.threshold] || d.threshold) + ')</span>';
         }
 
         case 'channel_change': {

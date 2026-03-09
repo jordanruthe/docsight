@@ -21,7 +21,7 @@
             </div>
             <div class="form-field" style="grid-column: 1 / -1">
                 <label class="form-label" for="notify_webhook_token">{{ t.notify_webhook_token }}</label>
-                <input class="form-input" type="password" id="notify_webhook_token" name="notify_webhook_token" value="" placeholder="{% if config.notify_webhook_token %}{{ t.saved_ph|default('Saved') }}{% endif %}">
+                <input class="form-input" type="password" id="notify_webhook_token" name="notify_webhook_token" value="" placeholder="{% if config.notify_webhook_token %}{{ t.saved_ph }}{% endif %}">
                 <span class="form-hint">{{ t.notify_webhook_token_hint }}</span>
             </div>
             <div class="form-field">
@@ -88,44 +88,44 @@
             <tbody>
                 <tr class="notify-event-row" data-event="health_change">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="health_change" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Health Change</span></td>
-                    <td><span class="badge badge-danger">critical</span></td>
+                    <td><span class="event-name">{{ t.notify_event_health_change }}</span></td>
+                    <td><span class="badge badge-danger">{{ t.severity_critical }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="health_change" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="power_change">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="power_change" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Power Change</span></td>
-                    <td><span class="badge badge-warning">warning</span></td>
+                    <td><span class="event-name">{{ t.notify_event_power_change }}</span></td>
+                    <td><span class="badge badge-warning">{{ t.severity_warning }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="power_change" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="snr_change">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="snr_change" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">SNR Change</span></td>
-                    <td><span class="badge badge-warning">warning</span></td>
+                    <td><span class="event-name">{{ t.notify_event_snr_change }}</span></td>
+                    <td><span class="badge badge-warning">{{ t.severity_warning }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="snr_change" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="channel_change">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="channel_change" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Channel Change</span></td>
-                    <td><span class="badge badge-muted">info</span></td>
+                    <td><span class="event-name">{{ t.notify_event_channel_change }}</span></td>
+                    <td><span class="badge badge-muted">{{ t.severity_info }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="channel_change" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="modulation_change">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="modulation_change" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Modulation Change</span></td>
-                    <td><span class="badge badge-muted">info</span></td>
+                    <td><span class="event-name">{{ t.notify_event_modulation_change }}</span></td>
+                    <td><span class="badge badge-muted">{{ t.severity_info }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="modulation_change" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="error_spike">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="error_spike" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Error Spike</span></td>
-                    <td><span class="badge badge-danger">critical</span></td>
+                    <td><span class="event-name">{{ t.notify_event_error_spike }}</span></td>
+                    <td><span class="badge badge-danger">{{ t.severity_critical }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="error_spike" min="1" step="1" placeholder="default"></td>
                 </tr>
                 <tr class="notify-event-row" data-event="monitoring_started">
                     <td><label class="toggle"><input type="checkbox" class="notify-toggle" data-event="monitoring_started" checked><span class="toggle-slider"></span></label></td>
-                    <td><span class="event-name">Monitoring Started</span></td>
-                    <td><span class="badge badge-success">success</span></td>
+                    <td><span class="event-name">{{ t.notify_event_monitoring_started }}</span></td>
+                    <td><span class="badge badge-success">{{ t.severity_success }}</span></td>
                     <td><input type="number" class="form-input cooldown-input notify-cooldown-input" data-event="monitoring_started" min="1" step="1" placeholder="default"></td>
                 </tr>
             </tbody>

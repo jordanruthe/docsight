@@ -9,15 +9,15 @@
                     <i data-lucide="sun-moon"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('color_mode', 'Color Mode') }}</div>
-                    <div class="card-subtitle">{{ t.get('color_mode_desc', 'Switch between dark and light mode') }}</div>
+                    <div class="card-title">{{ t.color_mode }}</div>
+                    <div class="card-subtitle">{{ t.color_mode_desc }}</div>
                 </div>
             </div>
         </div>
         <div class="toggle-row">
             <div class="toggle-info">
-                <span class="toggle-title">{{ t.get('dark_mode', 'Dark Mode') }}</span>
-                <span class="toggle-desc">{{ t.get('dark_mode_hint', 'Toggle between dark and light theme') }}</span>
+                <span class="toggle-title">{{ t.dark_mode }}</span>
+                <span class="toggle-desc">{{ t.dark_mode_hint }}</span>
             </div>
             <label class="toggle">
                 <input type="checkbox" id="theme-toggle-appearance" {% if theme == 'dark' %}checked{% endif %} onchange="toggleThemeFromAppearance(this.checked)">
@@ -34,8 +34,8 @@
                     <i data-lucide="palette"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('installed_themes', 'Installed Themes') }}</div>
-                    <div class="card-subtitle">{{ t.get('installed_themes_desc', 'Select a theme to apply across the entire app') }}</div>
+                    <div class="card-title">{{ t.installed_themes }}</div>
+                    <div class="card-subtitle">{{ t.installed_themes_desc }}</div>
                 </div>
             </div>
         </div>
@@ -71,17 +71,17 @@
                         {% if mod.id == active_theme_id %}
                         <span class="theme-active-badge">
                             <i data-lucide="check-circle" style="width:14px;height:14px;"></i>
-                            {{ t.get('active', 'Active') }}
+                            {{ t.active }}
                         </span>
                         {% else %}
                         <button type="button" class="btn btn-ghost btn-sm theme-preview-btn"
                                 onclick="previewTheme(this.closest('.theme-card'))">
                             <i data-lucide="eye" style="width:14px;height:14px;"></i>
-                            {{ t.get('preview', 'Preview') }}
+                            {{ t.preview }}
                         </button>
                         <button type="button" class="btn btn-primary btn-sm theme-apply-btn"
                                 onclick="applyTheme('{{ mod.id }}')">
-                            {{ t.get('activate', 'Activate') }}
+                            {{ t.activate }}
                         </button>
                         {% endif %}
                     </div>
@@ -90,7 +90,7 @@
             {% else %}
                 <div class="empty-state">
                     <i data-lucide="palette" style="width:40px;height:40px;opacity:0.3;"></i>
-                    <p>{{ t.get('no_themes', 'No theme modules installed') }}</p>
+                    <p>{{ t.no_themes }}</p>
                 </div>
             {% endif %}
         </div>
@@ -99,13 +99,13 @@
     <!-- Preview Overlay (hidden by default) -->
     <div class="theme-preview-overlay" id="theme-preview-overlay" style="display:none;">
         <div class="theme-preview-bar glass">
-            <span>{{ t.get('previewing_theme', 'Previewing theme') }}: <strong id="preview-theme-name"></strong></span>
+            <span>{{ t.previewing_theme }}: <strong id="preview-theme-name"></strong></span>
             <div>
                 <button type="button" class="btn btn-ghost btn-sm" onclick="cancelPreview()">
-                    {{ t.get('cancel', 'Cancel') }}
+                    {{ t.cancel }}
                 </button>
                 <button type="button" class="btn btn-primary btn-sm" id="preview-apply-btn" onclick="applyPreviewedTheme()">
-                    {{ t.get('apply', 'Apply') }}
+                    {{ t.activate }}
                 </button>
             </div>
         </div>
@@ -119,19 +119,19 @@
                     <i data-lucide="download-cloud"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('available_themes', 'Available Themes') }}</div>
-                    <div class="card-subtitle">{{ t.get('available_themes_desc', 'Browse and install themes from the community') }}</div>
+                    <div class="card-title">{{ t.available_themes }}</div>
+                    <div class="card-subtitle">{{ t.available_themes_desc }}</div>
                 </div>
             </div>
             <button type="button" class="btn btn-ghost btn-sm" onclick="refreshRegistry()">
                 <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i>
-                {{ t.get('refresh', 'Refresh') }}
+                {{ t.refresh }}
             </button>
         </div>
 
         <div class="theme-gallery" id="registry-gallery">
             <div class="empty-state" id="registry-loading">
-                <p>{{ t.get('loading_registry', 'Loading themes...') }}</p>
+                <p>{{ t.loading_registry }}</p>
             </div>
         </div>
     </div>

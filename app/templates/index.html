@@ -181,7 +181,7 @@
             <a href="https://github.com/itsDNNS/docsight/releases" target="_blank">
                 {{ version }}
                 {% if update_available %}
-                <span class="update-badge" title="{{ update_available }}">Update</span>
+                <span class="update-badge" title="{{ update_available }}">{{ t.update_available }}</span>
                 {% endif %}
             </a>
             <div class="sidebar-icons">
@@ -307,7 +307,7 @@
                     <h1 class="hero-title">
                         <span class="status-dot {{ hero_health }}"></span>
                         {{ health_label }}
-                        {% if demo_mode %}<span class="badge badge-muted" style="font-size:0.68rem;">{{ t.demo_mode|default('DEMO') }}</span>{% endif %}
+                        {% if demo_mode %}<span class="badge badge-muted" style="font-size:0.68rem;">{{ t.demo_mode }}</span>{% endif %}
                     </h1>
                     <p class="hero-subtitle">{{ health_msgs.get(s.health, '') }}</p>
                 </div>
@@ -328,7 +328,7 @@
                     {% set _badge_class = 'badge-good' if _g in ('A', 'B') else ('badge-warn' if _g == 'C' else 'badge-crit') %}
                     <span class="hero-meta-item" style="cursor:help;"
                           title="{{ gaming_index.score }}/100 — {{ t['gaming_tooltip_' ~ gaming_index.grade|lower] }}{% if not gaming_index.has_speedtest %} ({{ t.gaming_no_speedtest }}){% endif %}">
-                        <i data-lucide="gamepad-2" style="width:14px;height:14px;"></i> Gaming <span class="badge {{ _badge_class }}" style="margin-left:2px;">{{ gaming_index.grade }}</span>
+                        <i data-lucide="gamepad-2" style="width:14px;height:14px;"></i> {{ t.gaming_badge_label }} <span class="badge {{ _badge_class }}" style="margin-left:2px;">{{ gaming_index.grade }}</span>
                     </span>
                     {% endif %}
                     <span class="hero-meta-item desktop-only" id="desktop-countdown"></span>
@@ -520,7 +520,7 @@
                 <canvas id="ds-health-donut" width="100" height="100"></canvas>
                 <div class="ring-center">
                     <span class="ring-pct" style="color:var(--{{ 'good' if ds_pct >= 80 else ('warn' if ds_pct >= 50 else 'crit') }});">{{ ds_pct }}%</span>
-                    <span class="ring-label-small">healthy</span>
+                    <span class="ring-label-small">{{ t.healthy }}</span>
                 </div>
             </div>
             <div class="ring-details">
@@ -541,7 +541,7 @@
                 <canvas id="us-health-donut" width="100" height="100"></canvas>
                 <div class="ring-center">
                     <span class="ring-pct" style="color:var(--{{ 'good' if us_pct >= 80 else ('warn' if us_pct >= 50 else 'crit') }});">{{ us_pct }}%</span>
-                    <span class="ring-label-small">healthy</span>
+                    <span class="ring-label-small">{{ t.healthy }}</span>
                 </div>
             </div>
             <div class="ring-details">
@@ -570,7 +570,7 @@
         <div class="channel-header">
             <div>
                 <div class="channel-title">{{ t.downstream }} {{ t.channels }}</div>
-                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">{{ ds|length }} {{ t.channels|lower }}{% if ds_versions %} · DOCSIS {{ ds_versions|join(' + ') }}{% endif %}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">{{ ds|length }} {{ t.channels }}{% if ds_versions %} · DOCSIS {{ ds_versions|join(' + ') }}{% endif %}</div>
             </div>
             <div class="channel-health-chips">
                 <span class="health-chip"><span class="dot good"></span> {{ ds_good }} {{ health_labels.good }}</span>
@@ -590,8 +590,8 @@
                 <div class="table-scroll">
                     <table class="channel-table">
                         <thead><tr>
-                            <th>Ch</th><th>{{ t.frequency }}</th><th>{{ t.th_power }}</th>
-                            <th>SNR</th><th>Mod.</th><th>{{ t.signal_health }}</th>
+                            <th>{{ t.ch_abbr }}</th><th>{{ t.frequency }}</th><th>{{ t.th_power }}</th>
+                            <th>{{ t.snr_abbr }}</th><th>{{ t.mod_abbr }}</th><th>{{ t.signal_health }}</th>
                         </tr></thead>
                         <tbody>
                         {% for ch in group.list %}
@@ -628,7 +628,7 @@
         <div class="channel-header">
             <div>
                 <div class="channel-title">{{ t.upstream }} {{ t.channels }}</div>
-                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">{{ us|length }} {{ t.channels|lower }}{% if us_versions %} · DOCSIS {{ us_versions|join(' + ') }}{% endif %}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">{{ us|length }} {{ t.channels }}{% if us_versions %} · DOCSIS {{ us_versions|join(' + ') }}{% endif %}</div>
             </div>
             <div class="channel-health-chips">
                 <span class="health-chip"><span class="dot good"></span> {{ us_good_c }} {{ health_labels.good }}</span>
@@ -648,8 +648,8 @@
                 <div class="table-scroll">
                     <table class="channel-table">
                         <thead><tr>
-                            <th>Ch</th><th>{{ t.frequency }}</th><th>{{ t.th_power }}</th>
-                            <th>Mod.</th><th>{{ t.signal_health }}</th>
+                            <th>{{ t.ch_abbr }}</th><th>{{ t.frequency }}</th><th>{{ t.th_power }}</th>
+                            <th>{{ t.mod_abbr }}</th><th>{{ t.signal_health }}</th>
                         </tr></thead>
                         <tbody>
                         {% for ch in group.list %}
@@ -856,7 +856,7 @@
     <!-- Calendar grid -->
     <div id="bqm-calendar" class="bqm-calendar">
         <div class="bqm-weekday-header">
-            <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+            <span>{{ t.weekday_mo }}</span><span>{{ t.weekday_tu }}</span><span>{{ t.weekday_we }}</span><span>{{ t.weekday_th }}</span><span>{{ t.weekday_fr }}</span><span>{{ t.weekday_sa }}</span><span>{{ t.weekday_su }}</span>
         </div>
         <div id="bqm-calendar-grid" class="bqm-calendar-grid"></div>
     </div>
@@ -1043,7 +1043,7 @@
             <table id="correlation-table">
                 <thead><tr>
                     <th>{{ t.timestamp }}</th>
-                    <th style="width:90px;">Source</th>
+                    <th style="width:90px;">{{ t.source }}</th>
                     <th>{{ t.event_message }}</th>
                     <th>{{ t.event_details }}</th>
                 </tr></thead>
@@ -1197,7 +1197,7 @@
             <button class="severity-pill" data-severity="warning" onclick="filterEventsBySeverity('warning')">{{ t.event_severity_warning }}</button>
             <button class="severity-pill" data-severity="critical" onclick="filterEventsBySeverity('critical')">{{ t.event_severity_critical }}</button>
             <span style="border-left:1px solid var(--card-border, rgba(255,255,255,0.08)); height:20px; margin:0 8px;"></span>
-            <button class="severity-pill active" id="hide-operational-btn" onclick="toggleHideOperational()">{{ t.event_hide_operational or 'Hide Operational' }}</button>
+            <button class="severity-pill active" id="hide-operational-btn" onclick="toggleHideOperational()">{{ t.event_hide_operational }}</button>
         </div>
     </div>
     
@@ -1589,17 +1589,17 @@
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 6v6l4 2"/>
                     </svg>
-                    <div class="chart-label">Speedtest History</div>
+                    <div class="chart-label">{{ t.speedtest_history }}</div>
                 </div>
             </div>
             <div class="speedtest-chart-wrap">
                 <canvas id="speedtest-chart"></canvas>
                 <div class="speedtest-chart-tooltip" id="speedtest-chart-tooltip"></div>
                 <div class="speedtest-chart-legend">
-                    <span class="legend-dl">Download (Mbps)</span>
-                    <span class="legend-ul">Upload (Mbps)</span>
-                    <span class="legend-ping">Ping (ms)</span>
-                    <span class="legend-thresh">80% Median DL</span>
+                    <span class="legend-dl">{{ t.legend_download }}</span>
+                    <span class="legend-ul">{{ t.legend_upload }}</span>
+                    <span class="legend-ping">{{ t.legend_ping }}</span>
+                    <span class="legend-thresh">{{ t.legend_threshold }}</span>
                 </div>
             </div>
         </div>
@@ -2508,7 +2508,7 @@ var T = {{ t|tojson }};
 <!-- Bottom Tab Bar (mobile only, hidden on desktop via CSS) -->
 <nav class="bottom-nav" role="tablist" aria-label="Main tabs">
     <button class="bottom-nav-item active" role="tab" aria-selected="true" onclick="switchView('live')">
-        <i data-lucide="radio"></i><span>Dashboard</span>
+        <i data-lucide="radio"></i><span>{{ t.dashboard }}</span>
     </button>
     <button class="bottom-nav-item" role="tab" aria-selected="false" onclick="switchView('events')">
         <i data-lucide="bell"></i><span>{{ t.event_log }}</span>

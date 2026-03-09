@@ -8,8 +8,8 @@
                     <i data-lucide="database"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('data_collection', 'Data Collection') }}</div>
-                    <div class="card-subtitle">{{ t.get('data_collection_desc', 'Configure polling interval, data retention and daily snapshots') }}</div>
+                    <div class="card-title">{{ t.data_collection }}</div>
+                    <div class="card-subtitle">{{ t.data_collection_desc }}</div>
                 </div>
             </div>
         </div>
@@ -40,8 +40,8 @@
                     <i data-lucide="globe"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('localization', 'Localization') }}</div>
-                    <div class="card-subtitle">{{ t.get('localization_desc', 'Language and timezone settings') }}</div>
+                    <div class="card-title">{{ t.localization }}</div>
+                    <div class="card-subtitle">{{ t.localization_desc }}</div>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
                 <span class="form-hint">{{ t.timezone_hint }}</span>
                 {% if tz_is_posix and not config.timezone %}
                 <span class="form-hint" style="color: var(--warning); margin-top: 4px; display: block;">
-                    {{ t.timezone_posix_warning|default('Your container uses "' + server_tz + '" which does not support daylight saving time. Select an IANA timezone (e.g. Europe/Berlin) to fix this.') }}
+                    {{ t.timezone_posix_warning }}
                 </span>
                 {% endif %}
             </div>
@@ -80,8 +80,8 @@
                     <i data-lucide="layout-dashboard"></i>
                 </div>
                 <div>
-                    <div class="card-title">{{ t.get('dashboard_features', 'Dashboard Features') }}</div>
-                    <div class="card-subtitle">{{ t.get('dashboard_features_desc', 'Toggle optional dashboard sections') }}</div>
+                    <div class="card-title">{{ t.dashboard_features }}</div>
+                    <div class="card-subtitle">{{ t.dashboard_features_desc }}</div>
                 </div>
             </div>
         </div>

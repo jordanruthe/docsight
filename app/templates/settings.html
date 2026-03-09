@@ -52,22 +52,22 @@
 
         <!-- Core Settings -->
         <div class="nav-group">
-            <div class="nav-group-label">{{ t.get('core', 'Core') }}</div>
+            <div class="nav-group-label">{{ t.core }}</div>
             <button class="nav-item active" data-section="connection" onclick="switchSection('connection')">
                 <i data-lucide="radio" class="nav-icon"></i>
                 {{ t.step_modem }}
             </button>
             <button class="nav-item" data-section="system" onclick="switchSection('system')">
                 <i data-lucide="settings" class="nav-icon"></i>
-                {{ t.get('system', 'System') }}
+                {{ t.system }}
             </button>
             <button class="nav-item" data-section="notifications" onclick="switchSection('notifications')">
                 <i data-lucide="bell" class="nav-icon"></i>
-                {{ t.get('notifications', 'Notifications') }}
+                {{ t.notifications }}
             </button>
             <button class="nav-item" data-section="security" onclick="switchSection('security')">
                 <i data-lucide="shield" class="nav-icon"></i>
-                {{ t.get('security', 'Security') }}
+                {{ t.security }}
             </button>
             <button class="nav-item" data-section="appearance" onclick="switchSection('appearance')">
                 <i data-lucide="palette" class="nav-icon"></i>
@@ -75,7 +75,7 @@
             </button>
             <button class="nav-item" data-section="modules" onclick="switchSection('modules')">
                 <i data-lucide="package" class="nav-icon"></i>
-                {{ t.modules_title|default('Module Store') }}
+                {{ t.modules_title }}
             </button>
         </div>
 
@@ -87,7 +87,7 @@
         {% if settings_modules %}
         <div class="nav-separator"></div>
         <div class="nav-group">
-            <div class="nav-group-label">{{ t.modules|default('Modules') }}</div>
+            <div class="nav-group-label">{{ t.modules }}</div>
             {% for mod in settings_modules|sort(attribute='name') %}
             <button class="nav-item" data-section="mod-{{ mod.id|replace('.', '_') }}" onclick="switchSection('mod-{{ mod.id|replace('.', '_') }}')">
                 <i data-lucide="{{ mod.menu.get('icon', 'puzzle') }}" class="nav-icon"></i>
@@ -163,7 +163,7 @@
             <div class="save-footer" id="save-footer">
                 <div class="unsaved-hint">
                     <span class="unsaved-dot"></span>
-                    {{ t.get('unsaved_changes', 'Unsaved changes') }}
+                    {{ t.unsaved_changes }}
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i data-lucide="save" style="width:16px;height:16px;"></i>
