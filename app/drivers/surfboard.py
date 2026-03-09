@@ -3,12 +3,18 @@
 Supports Arris/CommScope DOCSIS 3.1 SURFboard modems (S33, S34, SB8200)
 that expose an HNAP1 JSON API at /HNAP1/.
 
-Authentication is a two-phase HMAC-SHA256 handshake:
+Authentication is a two-phase HMAC handshake:
 1. POST Action "request" -- server returns Challenge, Cookie, PublicKey
-2. Derive PrivateKey = HMAC-SHA256(PublicKey+password, Challenge)
-3. Derive LoginPassword = HMAC-SHA256(PrivateKey, Challenge)
+2. Derive PrivateKey = HMAC(PublicKey+password, Challenge)
+3. Derive LoginPassword = HMAC(PrivateKey, Challenge)
 4. POST Action "login" with LoginPassword
 5. All subsequent requests use HNAP_AUTH header with timestamp-based HMAC
+
+The S34 uses HMAC-SHA256 while the SB8200 uses HMAC-MD5. The driver
+auto-detects the algorithm based on the modem's challenge response.
+
+Every HNAP request requires an HNAP_AUTH header, including the initial
+login request. Before authentication, the key ``withoutloginkey`` is used.
 
 Channel data arrives as pipe-delimited strings ("|+|" between channels,
 "^" between fields within a channel).
@@ -27,6 +33,7 @@ log = logging.getLogger("docsis.driver.surfboard")
 
 _HNAP_LOGIN_URI = '"http://purenetworks.com/HNAP1/Login"'
 _HNAP_MULTI_URI = '"http://purenetworks.com/HNAP1/GetMultipleHNAPs"'
+_HNAP_PRELOGIN_KEY = "withoutloginkey"
 
 # Fields per downstream channel (split by "^"):
 # num ^ lock ^ modulation ^ channelID ^ frequency ^ power ^ snr ^ corrErrors ^ uncorrErrors ^
@@ -40,7 +47,12 @@ _US_FIELDS = 7
 class SurfboardDriver(ModemDriver):
     """Driver for Arris SURFboard DOCSIS 3.1 modems (S33/S34/SB8200).
 
-    Uses HNAP1 JSON API with HMAC-SHA256 authentication.
+    Uses HNAP1 JSON API with HMAC authentication (SHA256 for S34,
+    MD5 for SB8200 -- auto-detected on first login).
+
+    Every HNAP request must include an ``HNAP_AUTH`` header, even the
+    initial login.  Before authentication the pre-shared key
+    ``withoutloginkey`` is used.
 
     Session management: The modem tracks active sessions by IP address and
     only allows one concurrent login. Re-logging in while a session is active
@@ -66,6 +78,9 @@ class SurfboardDriver(ModemDriver):
         self._private_key = ""
         self._cookie = ""
         self._logged_in = False
+        # HMAC algorithm -- auto-detected during login.
+        # S34 uses SHA256, SB8200 uses MD5.
+        self._hmac_algo: str = ""
 
     def _fresh_session(self) -> None:
         """Reset HTTP session to clear stale cookies/state."""
@@ -75,15 +90,16 @@ class SurfboardDriver(ModemDriver):
         self._private_key = ""
         self._cookie = ""
         self._logged_in = False
+        self._hmac_algo = ""
 
     def login(self) -> None:
-        """Two-phase HNAP login with HMAC-SHA256.
+        """Two-phase HNAP login with HMAC.
 
         Reuses the existing session if already authenticated. Only performs
         a fresh login when no session exists or after a failed request
         invalidated the session.
 
-        Retries once with a fresh session on ConnectionError or when the
+        Retries with a fresh session on ConnectionError or when the
         modem returns no challenge (stale session / concurrent login).
         """
         if self._logged_in:
@@ -117,8 +133,22 @@ class SurfboardDriver(ModemDriver):
                 raise RuntimeError(f"SURFboard login failed: {e}")
 
     def _do_login(self) -> None:
-        """Execute the two-phase HNAP login handshake."""
-        # Phase 1: request challenge
+        """Execute the two-phase HNAP login handshake.
+
+        The HNAP_AUTH header is required on *every* request, including
+        the initial login.  Before we have a PrivateKey the modem
+        expects the pre-shared key ``withoutloginkey``.
+
+        Phase 1 (challenge request) is algorithm-agnostic -- the modem
+        returns the same challenge regardless.  Phase 2 (password
+        derivation) depends on the firmware's HMAC algorithm: S34 uses
+        SHA-256, SB8200 uses MD5.  We request the challenge once, then
+        try SHA-256 first; if the modem rejects the derived password we
+        re-derive with MD5 using the same challenge -- no extra round
+        trip that could trigger a RELOAD.
+        """
+        # Phase 1: request challenge (algorithm-agnostic, only hit modem once)
+        self._private_key = _HNAP_PRELOGIN_KEY
         body = {
             "Login": {
                 "Action": "request",
@@ -128,7 +158,7 @@ class SurfboardDriver(ModemDriver):
                 "PrivateLogin": "LoginPassword",
             }
         }
-        resp = self._hnap_post("Login", body, auth=False)
+        resp = self._hnap_post("Login", body)
         login_resp = resp.get("LoginResponse", {})
 
         challenge = login_resp.get("Challenge", "")
@@ -139,23 +169,54 @@ class SurfboardDriver(ModemDriver):
             log.debug("HNAP login response: %s", login_resp)
             raise RuntimeError("SURFboard login failed: no challenge received")
 
-        # Derive keys
+        self._cookie = cookie
+        self._session.cookies.set("uid", cookie)
+
+        # Phase 2: derive keys and authenticate.
+        # Try known algorithm first, otherwise SHA-256 then MD5.
+        if self._hmac_algo == "md5":
+            algos = [hashlib.md5]
+        elif self._hmac_algo == "sha256":
+            algos = [hashlib.sha256]
+        else:
+            algos = [hashlib.sha256, hashlib.md5]
+
+        last_error: str | None = None
+        for algo in algos:
+            algo_name = "sha256" if algo is hashlib.sha256 else "md5"
+            try:
+                self._try_phase2(algo, challenge, public_key)
+                self._hmac_algo = algo_name
+                log.debug("SURFboard HMAC algorithm: %s", algo_name)
+                return
+            except RuntimeError as e:
+                last_error = str(e)
+                if len(algos) > 1:
+                    log.debug(
+                        "SURFboard phase 2 with %s failed (%s), trying next algorithm",
+                        algo_name, last_error,
+                    )
+                    continue
+                raise
+
+        raise RuntimeError(last_error or "SURFboard login failed")
+
+    def _try_phase2(self, algo, challenge: str, public_key: str) -> None:
+        """Derive keys and send Phase 2 login using the given algorithm."""
         self._private_key = hmac.new(
             (public_key + self._password).encode(),
             challenge.encode(),
-            hashlib.sha256,
+            algo,
         ).hexdigest().upper()
 
         login_password = hmac.new(
             self._private_key.encode(),
             challenge.encode(),
-            hashlib.sha256,
+            algo,
         ).hexdigest().upper()
 
-        self._cookie = cookie
-        self._session.cookies.set("uid", cookie)
+        self._session.cookies.set("PrivateKey", self._private_key)
 
-        # Phase 2: login with derived password
         body = {
             "Login": {
                 "Action": "login",
@@ -165,7 +226,7 @@ class SurfboardDriver(ModemDriver):
                 "PrivateLogin": "LoginPassword",
             }
         }
-        resp = self._hnap_post("Login", body, auth=False)
+        resp = self._hnap_post("Login", body, auth_algo=algo)
         login_resp = resp.get("LoginResponse", {})
         result = login_resp.get("LoginResult", "")
 
@@ -243,13 +304,18 @@ class SurfboardDriver(ModemDriver):
 
     # -- HNAP transport --
 
-    def _hnap_post(self, action: str, body: dict, auth: bool = True) -> dict:
+    def _hnap_post(self, action: str, body: dict, *,
+                   auth_algo=None) -> dict:
         """Send an HNAP1 JSON POST request.
+
+        HNAP_AUTH is sent on **every** request.  Before login the
+        pre-shared key ``withoutloginkey`` is used as PrivateKey.
 
         Args:
             action: HNAP action name (e.g. "Login", "GetMultipleHNAPs")
             body: JSON body to send
-            auth: Whether to include HNAP_AUTH header (False for login phase)
+            auth_algo: Hash constructor for HNAP_AUTH HMAC.  When *None*
+                the previously detected algorithm is used (sha256 default).
         """
         url = f"{self._url}/HNAP1/"
 
@@ -258,20 +324,28 @@ class SurfboardDriver(ModemDriver):
         else:
             soap_action = _HNAP_MULTI_URI
 
+        # Determine HMAC algorithm
+        if auth_algo is not None:
+            algo = auth_algo
+        elif self._hmac_algo == "md5":
+            algo = hashlib.md5
+        else:
+            algo = hashlib.sha256
+
+        ts = str(int(time.time() * 1000) % 2_000_000_000_000)
+        auth_key = self._private_key or _HNAP_PRELOGIN_KEY
+        auth_payload = ts + soap_action
+        auth_hash = hmac.new(
+            auth_key.encode(),
+            auth_payload.encode(),
+            algo,
+        ).hexdigest().upper()
+
         headers = {
             "Content-Type": "application/json",
             "SOAPACTION": soap_action,
+            "HNAP_AUTH": f"{auth_hash} {ts}",
         }
-
-        if auth:
-            ts = str(int(time.time() * 1000) % 2_000_000_000_000)
-            auth_payload = ts + soap_action
-            auth_hash = hmac.new(
-                self._private_key.encode(),
-                auth_payload.encode(),
-                hashlib.sha256,
-            ).hexdigest().upper()
-            headers["HNAP_AUTH"] = f"{auth_hash} {ts}"
 
         r = self._session.post(url, json=body, headers=headers, timeout=30)
         if not r.ok:
