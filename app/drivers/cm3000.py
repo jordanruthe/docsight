@@ -28,28 +28,30 @@ _STATUS_PATH = "/DocsisStatus.htm"
 # Match the single-quoted live tagValueList in each function.
 # Commented-out examples use double quotes or /* */ blocks, so
 # targeting single quotes skips them reliably.
+# Uses .*? (lazy) instead of [^}]*? to support nested braces in
+# function bodies (e.g. if-blocks in some firmware versions).
 _RE_DS_QAM = re.compile(
-    r"function\s+InitDsTableTagValue\s*\(\)\s*\{[^}]*?"
+    r"function\s+InitDsTableTagValue\s*\(\)\s*\{.*?"
     r"var\s+tagValueList\s*=\s*'([^']+)';",
     re.DOTALL,
 )
 _RE_US_ATDMA = re.compile(
-    r"function\s+InitUsTableTagValue\s*\(\)\s*\{[^}]*?"
+    r"function\s+InitUsTableTagValue\s*\(\)\s*\{.*?"
     r"var\s+tagValueList\s*=\s*'([^']+)';",
     re.DOTALL,
 )
 _RE_DS_OFDM = re.compile(
-    r"function\s+InitDsOfdmTableTagValue\s*\(\)\s*\{[^}]*?"
+    r"function\s+InitDsOfdmTableTagValue\s*\(\)\s*\{.*?"
     r"var\s+tagValueList\s*=\s*'([^']+)';",
     re.DOTALL,
 )
 _RE_US_OFDMA = re.compile(
-    r"function\s+InitUsOfdmaTableTagValue\s*\(\)\s*\{[^}]*?"
+    r"function\s+InitUsOfdmaTableTagValue\s*\(\)\s*\{.*?"
     r"var\s+tagValueList\s*=\s*'([^']+)';",
     re.DOTALL,
 )
 _RE_SYS_INFO = re.compile(
-    r"function\s+InitTagValue\s*\(\)\s*\{[^}]*?"
+    r"function\s+InitTagValue\s*\(\)\s*\{.*?"
     r"var\s+tagValueList\s*=\s*'([^']+)';",
     re.DOTALL,
 )
@@ -120,6 +122,18 @@ class CM3000Driver(ModemDriver):
         ds31 = self._parse_ds_ofdm(html)
         us31 = self._parse_us_ofdma(html)
 
+        total = len(ds30) + len(us30) + len(ds31) + len(us31)
+        if total == 0:
+            log.warning(
+                "CM3000 parsed 0 channels (DS QAM regex=%s, US ATDMA regex=%s, "
+                "DS OFDM regex=%s, US OFDMA regex=%s, page length=%d)",
+                _RE_DS_QAM.search(html) is not None,
+                _RE_US_ATDMA.search(html) is not None,
+                _RE_DS_OFDM.search(html) is not None,
+                _RE_US_OFDMA.search(html) is not None,
+                len(html),
+            )
+
         return {
             "channelDs": {"docsis30": ds30, "docsis31": ds31},
             "channelUs": {"docsis30": us30, "docsis31": us31},
@@ -160,11 +174,11 @@ class CM3000Driver(ModemDriver):
         """Fetch the raw HTML of /DocsisStatus.htm.
 
         Reuses the validated HTML captured during login when available.
+        The cache persists until the next login() call overwrites it,
+        so all methods in a single collect cycle use the same page.
         """
         if self._status_html is not None:
-            html = self._status_html
-            self._status_html = None
-            return html
+            return self._status_html
 
         try:
             r = self._session.get(

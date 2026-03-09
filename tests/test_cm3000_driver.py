@@ -474,7 +474,8 @@ class TestValueParsers:
         with patch.object(driver._session, "get") as mock_get:
             assert driver._fetch_status_page() == STATUS_HTML
             mock_get.assert_not_called()
-            assert driver._status_html is None
+            # Cache persists for the entire collect cycle
+            assert driver._status_html == STATUS_HTML
 
 
 # -- Regex patterns --
@@ -501,6 +502,34 @@ class TestRegexPatterns:
         assert _RE_DS_OFDM.search(html) is not None
         assert _RE_US_OFDMA.search(html) is not None
         assert _RE_SYS_INFO.search(html) is not None
+
+
+# -- Collect cycle (cache reuse) --
+
+class TestCollectCycle:
+    def test_device_info_and_docsis_data_share_cached_html(self, driver):
+        """Both get_device_info() and get_docsis_data() must use the same
+        cached HTML from login(), without a second HTTP fetch."""
+        driver._status_html = STATUS_HTML
+
+        with patch.object(driver._session, "get") as mock_get:
+            info = driver.get_device_info()
+            data = driver.get_docsis_data()
+            mock_get.assert_not_called()
+
+        assert info["model"] == "CM3000"
+        assert len(data["channelDs"]["docsis30"]) == 32
+        assert len(data["channelUs"]["docsis30"]) == 4
+
+    def test_regex_handles_nested_braces(self, driver):
+        """Functions with nested braces (if-blocks) must still parse."""
+        html = _build_status_html().replace(
+            "function InitDsTableTagValue()\n{",
+            "function InitDsTableTagValue()\n{\n    if (true) { console.log('ok'); }",
+        )
+        driver._status_html = html
+        data = driver.get_docsis_data()
+        assert len(data["channelDs"]["docsis30"]) == 32
 
 
 # -- Analyzer integration --
