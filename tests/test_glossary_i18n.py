@@ -12,9 +12,9 @@ MOD_I18N_DIR = os.path.join(
 
 CORE_GLOSSARY_KEYS = [
     "glossary_snr",
-    "glossary_power",
-    "glossary_correctable",
-    "glossary_uncorrectable",
+    "glossary_ds_power",
+    "glossary_us_power",
+    "glossary_errors",
     "glossary_scqam",
     "glossary_ofdm",
     "glossary_modulation",

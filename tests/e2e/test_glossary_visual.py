@@ -33,7 +33,7 @@ class TestGlossaryVisualDesktop:
         hint = demo_page.locator('#view-dashboard .glossary-hint').first
         hint.click()
         demo_page.wait_for_timeout(300)
-        expect(hint.locator('.glossary-popover')).to_be_visible()
+        expect(demo_page.locator('body > .glossary-popover')).to_be_visible()
         demo_page.screenshot(
             path=os.path.join(SCREENSHOT_DIR, "popover_open.png"),
             full_page=False,

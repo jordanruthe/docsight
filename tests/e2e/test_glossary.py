@@ -4,6 +4,10 @@ import pytest
 from playwright.sync_api import expect
 
 
+# The visible popover is a body-level overlay (JS moves it out of the hint)
+POPOVER = 'body > .glossary-popover'
+
+
 class TestGlossaryPresence:
     """Verify glossary hint icons are rendered on the dashboard."""
 
@@ -24,26 +28,25 @@ class TestGlossaryPopover:
     """Verify popover open/close behavior."""
 
     def test_popover_hidden_by_default(self, demo_page):
-        popover = demo_page.locator('#view-dashboard .glossary-popover').first
+        popover = demo_page.locator(POPOVER)
         expect(popover).not_to_be_visible()
 
     def test_click_opens_popover(self, demo_page):
         hint = demo_page.locator('#view-dashboard .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
-        expect(popover).to_be_visible()
+        expect(demo_page.locator(POPOVER)).to_be_visible()
 
     def test_popover_has_text_content(self, demo_page):
         hint = demo_page.locator('#view-dashboard .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
+        popover = demo_page.locator(POPOVER)
         text = popover.text_content()
         assert len(text) > 20, f"Popover text too short: {text}"
 
     def test_click_outside_closes_popover(self, demo_page):
         hint = demo_page.locator('#view-dashboard .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
+        popover = demo_page.locator(POPOVER)
         expect(popover).to_be_visible()
         demo_page.locator('body').click(position={"x": 10, "y": 10})
         expect(popover).not_to_be_visible()
@@ -51,7 +54,7 @@ class TestGlossaryPopover:
     def test_escape_closes_popover(self, demo_page):
         hint = demo_page.locator('#view-dashboard .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
+        popover = demo_page.locator(POPOVER)
         expect(popover).to_be_visible()
         demo_page.keyboard.press("Escape")
         expect(popover).not_to_be_visible()
@@ -59,12 +62,15 @@ class TestGlossaryPopover:
     def test_clicking_second_hint_closes_first(self, demo_page):
         hints = demo_page.locator('#view-dashboard .glossary-hint')
         first = hints.nth(0)
-        second = hints.nth(1)
+        second = hints.nth(2)  # skip nth(1) — same glossary_power text as nth(0)
+        popover = demo_page.locator(POPOVER)
         first.click()
-        expect(first.locator('.glossary-popover')).to_be_visible()
+        expect(popover).to_be_visible()
+        first_text = popover.text_content()
         second.click()
-        expect(first.locator('.glossary-popover')).not_to_be_visible()
-        expect(second.locator('.glossary-popover')).to_be_visible()
+        expect(popover).to_be_visible()
+        second_text = popover.text_content()
+        assert first_text != second_text, "Popover text should change between hints"
 
 
 class TestGlossaryChannels:
@@ -77,7 +83,7 @@ class TestGlossaryChannels:
     def test_channel_glossary_popover_works(self, demo_page):
         hint = demo_page.locator('#view-dashboard .docsis-group-header .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
+        popover = demo_page.locator(POPOVER)
         expect(popover).to_be_visible()
         text = popover.text_content()
         assert len(text) > 20
@@ -97,5 +103,4 @@ class TestGlossaryModulation:
         demo_page.wait_for_timeout(2000)
         hint = demo_page.locator('#view-modulation .glossary-hint').first
         hint.click()
-        popover = hint.locator('.glossary-popover')
-        expect(popover).to_be_visible()
+        expect(demo_page.locator(POPOVER)).to_be_visible()

@@ -8,20 +8,20 @@
   vertical-align: middle;
 }
 
-/* Inside metric cards: position in top-right corner */
+/* Inside metric cards: position in top-left corner */
 .metric-card .glossary-hint {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   margin: 0;
   z-index: 2;
 }
 
-/* Inside modulation KPI cards: top-right corner */
+/* Inside modulation KPI cards: top-left corner */
 .modulation-kpi-card .glossary-hint {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
   margin: 0;
   z-index: 2;
 }
@@ -41,7 +41,13 @@
   color: var(--amethyst-light);
 }
 
-.glossary-popover {
+/* Hidden source text inside hints (JS copies to body-level overlay) */
+.glossary-hint .glossary-popover {
+  display: none !important;
+}
+
+/* Body-level overlay popover (appended by JS) */
+body > .glossary-popover {
   display: none;
   position: fixed;
   width: max-content;
@@ -55,7 +61,7 @@
   font-size: 0.8rem;
   font-weight: 400;
   line-height: 1.5;
-  z-index: 500;
+  z-index: 9999;
   pointer-events: auto;
   white-space: normal;
   text-transform: none;
@@ -64,7 +70,7 @@
 }
 
 /* Arrow */
-.glossary-popover::before {
+body > .glossary-popover::before {
   content: '';
   position: absolute;
   left: 50%;
@@ -77,7 +83,7 @@
   border-top: 1px solid var(--glass-border);
 }
 
-.glossary-popover.above::before {
+body > .glossary-popover.above::before {
   top: auto;
   bottom: -5px;
   border-left: none;
@@ -86,14 +92,9 @@
   border-bottom: 1px solid var(--glass-border);
 }
 
-/* Open state */
-.glossary-hint.open .glossary-popover {
-  display: block;
-}
-
 /* Mobile: full width bottom sheet */
 @media (max-width: 768px) {
-  .glossary-popover {
+  body > .glossary-popover {
     left: 16px !important;
     right: 16px;
     top: auto !important;
@@ -101,7 +102,7 @@
     width: auto;
     max-width: none;
   }
-  .glossary-popover::before {
+  body > .glossary-popover::before {
     display: none;
   }
 }

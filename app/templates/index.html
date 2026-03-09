@@ -389,7 +389,7 @@
     <div class="metrics-grid">
         {# Card 1: DS Power #}
         <div class="metric-card glass">
-            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_power }}</div></span>
+            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_ds_power }}</div></span>
             <div class="metric-header">
                 <span class="metric-label">{{ t.signal_ds_power }}</span>
                 <div class="metric-icon purple"><i data-lucide="arrow-down"></i></div>
@@ -406,7 +406,7 @@
 
         {# Card 2: US Power #}
         <div class="metric-card glass">
-            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_power }}</div></span>
+            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_us_power }}</div></span>
             <div class="metric-header">
                 <span class="metric-label">{{ t.signal_us_power }}</span>
                 <div class="metric-icon blue"><i data-lucide="arrow-up"></i></div>
@@ -440,7 +440,7 @@
 
         {# Card 4: Errors #}
         <div class="metric-card glass">
-            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_correctable }} {{ t.glossary_uncorrectable }}</div></span>
+            <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_errors }}</div></span>
             <div class="metric-header">
                 <span class="metric-label">{{ t.card_errors }}</span>
                 <div class="metric-icon amber"><i data-lucide="alert-triangle"></i></div>
@@ -582,7 +582,7 @@
 
         {% for group in ds|groupby('docsis_version')|reverse %}
         <div class="docsis-group">
-            <div class="docsis-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <div class="docsis-group-header" onclick="if(!event.target.closest('.glossary-hint'))this.parentElement.classList.toggle('open')">
                 <i data-lucide="chevron-right"></i>
                 DOCSIS {{ group.grouper }} {{ 'OFDM' if group.grouper == '3.1' else 'SC-QAM' }} <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_ofdm if group.grouper == '3.1' else t.glossary_scqam }}</div></span> · {{ group.list|length }} {{ t.channel if group.list|length == 1 else t.channels }}
             </div>
@@ -640,7 +640,7 @@
 
         {% for group in us|groupby('docsis_version')|reverse %}
         <div class="docsis-group">
-            <div class="docsis-group-header" onclick="this.parentElement.classList.toggle('open')">
+            <div class="docsis-group-header" onclick="if(!event.target.closest('.glossary-hint'))this.parentElement.classList.toggle('open')">
                 <i data-lucide="chevron-right"></i>
                 DOCSIS {{ group.grouper }} {{ 'OFDMA' if group.grouper == '3.1' else 'SC-QAM' }} <span class="glossary-hint"><i data-lucide="info"></i><div class="glossary-popover">{{ t.glossary_ofdm if group.grouper == '3.1' else t.glossary_scqam }}</div></span> · {{ group.list|length }} {{ t.channel if group.list|length == 1 else t.channels }}
             </div>
