@@ -48,6 +48,9 @@ class SB6190Driver(ModemDriver):
     """
 
     def __init__(self, url, user, password):
+        if url.startswith("http://"):
+            url = "https://" + url[len("http://"):]
+            log.info("SB6190 requires HTTPS, upgraded URL to %s", url)
         super().__init__(url, user, password)
         self._session = requests.Session()
         self._session.verify = False
@@ -55,6 +58,8 @@ class SB6190Driver(ModemDriver):
         self._session.mount("https://", adapter)
 
     def login(self) -> None:
+        # The SB6190 login page JS URL-encodes the full "username=..." and
+        # "password=..." strings before Base64 encoding, not just the values.
         payload = base64.b64encode(
             (quote(f"username={self._user}") + ":" + quote(f"password={self._password}")).encode()
         ).decode()

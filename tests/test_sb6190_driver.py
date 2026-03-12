@@ -107,6 +107,10 @@ class TestDriverInit:
         d = SB6190Driver("https://192.168.100.1", "admin", "pass")
         assert d._url == "https://192.168.100.1"
 
+    def test_upgrades_http_url_to_https(self):
+        d = SB6190Driver("http://192.168.100.1", "admin", "pass")
+        assert d._url == "https://192.168.100.1"
+
     def test_stores_credentials(self):
         d = SB6190Driver("https://192.168.100.1", "admin", "secret")
         assert d._user == "admin"
